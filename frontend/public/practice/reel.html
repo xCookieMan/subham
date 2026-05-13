@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reels / Shorts</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050505;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            padding: 60px 40px;
+            overflow-x: hidden;
+        }
+
+        /* ===== HEADER - PREMIUM TEXT ANIMATIONS ===== */
+        .section-header {
+            margin-bottom: 40px;
+            padding: 0 10px;
+            position: relative;
+        }
+
+        /* Main title with character-by-character animation */
+        .section-header h2 {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+        }
+
+        .section-header h2 .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(50px) rotateX(-90deg);
+            animation: charReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            background: linear-gradient(180deg, #fff 0%, #ff6b35 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .section-header h2 .char.space {
+            width: 15px;
+        }
+
+        .section-header h2 .char.slash {
+            background: linear-gradient(180deg, #ff6b35 0%, #ff8c5a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: charReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+                glowPulse 2s ease-in-out infinite;
+            animation-delay: calc(0.05s * var(--char-index) + 0.8s), 2s;
+        }
+
+        @keyframes charReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) rotateX(-90deg) scale(0.5);
+                filter: blur(10px);
+            }
+
+            50% {
+                filter: blur(0px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg) scale(1);
+            }
+        }
+
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 5px rgba(255, 107, 53, 0.5));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 20px rgba(255, 107, 53, 1));
+            }
+        }
+
+        /* Subtitle with glitch effect */
+        .section-header .subtitle {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #666;
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+
+            opacity: 0;
+            animation: subtitleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 1.2s;
+        }
+
+        .section-header .subtitle::before,
+        .section-header .subtitle::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .section-header .subtitle::before {
+            color: #ff6b35;
+            animation: glitchTop 3s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+        }
+
+        .section-header .subtitle::after {
+            color: #00d9ff;
+            animation: glitchBottom 3s infinite;
+            clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+        }
+
+        @keyframes subtitleReveal {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
+                filter: blur(10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes glitchTop {
+
+            0%,
+            90%,
+            100% {
+                opacity: 0;
+                transform: translate(0);
+            }
+
+            92% {
+                opacity: 0.8;
+                transform: translate(-2px, -2px);
+            }
+
+            94% {
+                opacity: 0;
+                transform: translate(2px, 2px);
+            }
+
+            96% {
+                opacity: 0.8;
+                transform: translate(-2px, 0);
+            }
+        }
+
+        @keyframes glitchBottom {
+
+            0%,
+            90%,
+            100% {
+                opacity: 0;
+                transform: translate(0);
+            }
+
+            93% {
+                opacity: 0.8;
+                transform: translate(2px, 2px);
+            }
+
+            95% {
+                opacity: 0;
+                transform: translate(-2px, -2px);
+            }
+
+            97% {
+                opacity: 0.8;
+                transform: translate(2px, 0);
+            }
+        }
+
+        /* Animated underline with gradient */
+        .section-header .underline {
+            width: 0;
+            height: 3px;
+            margin-top: 15px;
+            background: linear-gradient(90deg, #ff6b35, #ff8c5a, #ffd4a3);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.6);
+
+            animation: underlineExpand 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 1.5s;
+        }
+
+        .section-header .underline::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            animation: shimmerLine 2s infinite;
+            animation-delay: 2.5s;
+        }
+
+        @keyframes underlineExpand {
+            to {
+                width: 150px;
+            }
+        }
+
+        @keyframes shimmerLine {
+            to {
+                left: 100%;
+            }
+        }
+
+        /* Decorative elements */
+        .section-header .decorations {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 18px;
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+            animation-delay: 1.8s;
+        }
+
+        .section-header .decorations .line {
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(90deg, #ff6b35, transparent);
+        }
+
+        .section-header .decorations .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ff6b35;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.8);
+            animation: dotBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes dotBounce {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ===== CAROUSEL CONTAINER ===== */
+        .carousel-wrapper {
+            position: relative;
+            padding: 0 50px;
+        }
+
+        .carousel {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 20px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* ===== VIDEO CARD ===== */
+        .reel-card {
+            position: relative;
+            flex-shrink: 0;
+            width: 220px;
+            height: 390px;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #111;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+
+            opacity: 0;
+            transform: translateY(40px) scale(0.92);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reel-card.revealed {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .reel-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.7),
+                0 0 0 2px rgba(255, 107, 53, 0.4),
+                0 0 50px rgba(255, 107, 53, 0.2);
+            border-color: rgba(255, 107, 53, 0.4);
+            z-index: 10;
+        }
+
+        /* Thumbnail - Clean, no weird effects */
+        .reel-thumbnail {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reel-card:hover .reel-thumbnail {
+            transform: scale(1.1);
+        }
+
+        /* Gradient Overlay */
+        .reel-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom,
+                    transparent 0%,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.9) 100%);
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .reel-card:hover .reel-overlay {
+            opacity: 0.95;
+        }
+
+        /* Play Button */
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 107, 53, 0.95);
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 2;
+            box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+        }
+
+        .reel-card.revealed .play-icon {
+            transform: translate(-50%, -50%) scale(1);
+            transition-delay: 0.3s;
+        }
+
+        .play-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #fff;
+            margin-left: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .reel-card:hover .play-icon {
+            transform: translate(-50%, -50%) scale(1.15);
+            box-shadow:
+                0 0 0 6px rgba(255, 107, 53, 0.2),
+                0 0 40px rgba(255, 107, 53, 0.6);
+            background: rgba(255, 107, 53, 1);
+        }
+
+        .reel-card:hover .play-icon svg {
+            transform: scale(1.1);
+        }
+
+        /* View Count */
+        .view-count {
+            position: absolute;
+            bottom: 14px;
+            left: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        .reel-card.revealed .view-count {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: 0.4s;
+        }
+
+        .view-count svg {
+            width: 14px;
+            height: 14px;
+            fill: #ff6b35;
+        }
+
+        /* Duration Badge */
+        .duration {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            z-index: 2;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+
+            opacity: 0;
+            transform: translateY(-15px);
+        }
+
+        .reel-card.revealed .duration {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: 0.35s;
+        }
+
+        /* ===== NAVIGATION ARROWS ===== */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+            animation-delay: 2s;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 107, 53, 0.95);
+            border-color: #ff6b35;
+            transform: translateY(-50%) scale(1.15);
+            box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+        }
+
+        .nav-arrow.prev {
+            left: 0;
+        }
+
+        .nav-arrow.next {
+            right: 0;
+        }
+
+        .nav-arrow svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* ===== VIDEO MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            width: min(90vw, 500px);
+            aspect-ratio: 9/16;
+            max-height: 90vh;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            transform: scale(0.8) translateY(50px);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow:
+                0 40px 100px rgba(0, 0, 0, 0.8),
+                0 0 0 1px rgba(255, 107, 53, 0.2),
+                0 0 80px rgba(255, 107, 53, 0.15);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-content video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 107, 53, 0.95);
+            border-color: #ff6b35;
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 0 25px rgba(255, 107, 53, 0.5);
+        }
+
+        .modal-title {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 80px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease 0.3s;
+        }
+
+        .modal-overlay.active .modal-title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body {
+                padding: 40px 20px;
+            }
+
+            .section-header h2 {
+                font-size: 28px;
+            }
+
+            .carousel-wrapper {
+                padding: 0 40px;
+            }
+
+            .reel-card {
+                width: 180px;
+                height: 320px;
+            }
+
+            .nav-arrow {
+                width: 40px;
+                height: 40px;
+            }
+
+            .modal-content {
+                width: 95vw;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="section-header">
+        <h2 id="animatedTitle">REELS / SHORTS</h2>
+        <div class="subtitle" data-text="Fast cuts. Big impact.">Fast cuts. Big impact.</div>
+        <div class="underline"></div>
+        <div class="decorations">
+            <div class="line"></div>
+            <div class="dot"></div>
+            <div class="line" style="transform: scaleX(-1);"></div>
+        </div>
+    </div>
+
+    <div class="carousel-wrapper">
+        <button class="nav-arrow prev" onclick="scrollCarousel(-1)">
+            <svg viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+        </button>
+
+        <div class="carousel" id="carousel">
+            <!-- Cards will be inserted here by JavaScript -->
+        </div>
+
+        <button class="nav-arrow next" onclick="scrollCarousel(1)">
+            <svg viewBox="0 0 24 24">
+                <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- VIDEO MODAL -->
+    <div class="modal-overlay" id="videoModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">✕</button>
+            <video id="modalVideo" controls playsinline preload="metadata">
+                <source src="" type="video/mp4">
+            </video>
+            <div class="modal-title" id="modalTitle">Video Title</div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for reels with actual video URLs
+        const reels = [
+            {
+                id: 1,
+                title: "Urban Nights",
+                thumbnail: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=400&h=700&fit=crop",
+                views: "1.2M",
+                duration: "0:15",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+            },
+            {
+                id: 2,
+                title: "Camera Magic",
+                thumbnail: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=700&fit=crop",
+                views: "2.5M",
+                duration: "0:30",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+            },
+            {
+                id: 3,
+                title: "Mountain Dreams",
+                thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=700&fit=crop",
+                views: "845K",
+                duration: "0:22",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+            },
+            {
+                id: 4,
+                title: "Travel Vibes",
+                thumbnail: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=700&fit=crop",
+                views: "1.7M",
+                duration: "0:45",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+            },
+            {
+                id: 5,
+                title: "Fashion Forward",
+                thumbnail: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=700&fit=crop",
+                views: "3.2M",
+                duration: "0:18",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
+            },
+            {
+                id: 6,
+                title: "Ocean Waves",
+                thumbnail: "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=400&h=700&fit=crop",
+                views: "1.1M",
+                duration: "0:28",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+            },
+            {
+                id: 7,
+                title: "City Lights",
+                thumbnail: "https://images.unsplash.com/photo-1433838552652-f9a46b332c40?w=400&h=700&fit=crop",
+                views: "956K",
+                duration: "0:35",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+            },
+            {
+                id: 8,
+                title: "Adventure Time",
+                thumbnail: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&h=700&fit=crop",
+                views: "2.8M",
+                duration: "0:42",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+            }
+        ];
+
+        const carousel = document.getElementById('carousel');
+        const videoModal = document.getElementById('videoModal');
+        const modalVideo = document.getElementById('modalVideo');
+        const modalClose = document.getElementById('modalClose');
+        const modalTitle = document.getElementById('modalTitle');
+
+        // Animate title character by character
+        function animateTitle() {
+            const title = document.getElementById('animatedTitle');
+            const text = title.textContent;
+            title.innerHTML = '';
+
+            text.split('').forEach((char, index) => {
+                const span = document.createElement('span');
+                span.className = char === ' ' ? 'char space' : char === '/' ? 'char slash' : 'char';
+                span.textContent = char === ' ' ? '\u00A0' : char;
+                span.style.setProperty('--char-index', index);
+                span.style.animationDelay = `${0.05 * index}s`;
+                title.appendChild(span);
+            });
+        }
+
+        // Render reels with staggered animation
+        function renderReels() {
+            carousel.innerHTML = reels.map((reel, index) => `
+                <div class="reel-card" data-index="${index}" onclick="playReel(${reel.id})">
+                    <div class="reel-thumbnail" style="background-image: url('${reel.thumbnail}')"></div>
+                    <div class="reel-overlay"></div>
+                    <div class="duration">${reel.duration}</div>
+                    <div class="play-icon">
+                        <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+                    </div>
+                    <div class="view-count">
+                        <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+                        ${reel.views}
+                    </div>
+                </div>
+            `).join('');
+
+            // Trigger staggered reveal animation
+            setTimeout(() => {
+                triggerStaggeredReveal();
+            }, 100);
+        }
+
+        // Staggered reveal
+        function triggerStaggeredReveal() {
+            const cards = document.querySelectorAll('.reel-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('revealed');
+                }, 100 + (index * 100));
+            });
+        }
+
+        // Play reel - Open modal with video
+        function playReel(id) {
+            const reel = reels.find(r => r.id === id);
+            if (reel) {
+                modalTitle.textContent = reel.title;
+                modalVideo.src = reel.video;
+                videoModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+
+                // Auto play video
+                setTimeout(() => {
+                    modalVideo.play().catch(e => console.log('Autoplay prevented:', e));
+                }, 300);
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            videoModal.classList.remove('active');
+            document.body.style.overflow = '';
+            setTimeout(() => {
+                modalVideo.pause();
+                modalVideo.src = '';
+            }, 300);
+        }
+
+        modalClose.addEventListener('click', closeModal);
+
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && videoModal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Scroll carousel
+        function scrollCarousel(direction) {
+            const scrollAmount = 240;
+            carousel.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') scrollCarousel(-1);
+            if (e.key === 'ArrowRight') scrollCarousel(1);
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        carousel.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        carousel.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (diff > 50) scrollCarousel(1);
+            if (diff < -50) scrollCarousel(-1);
+        }, { passive: true });
+
+        // Initialize
+        animateTitle();
+        renderReels();
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storytelling Editor | ProCut Studio</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030308;
+            --panel: rgba(14, 14, 22, 0.85);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --accent: #d4a574;
+            --accent-glow: rgba(212, 165, 116, 0.35);
+            --text: #f0f4f8;
+            --muted: #7a8499;
+            --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 999;
+            background-image: url("image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            mix-blend-mode: overlay;
+        }
+
+        .app {
+            position: relative;
+            z-index: 10;
+            width: 94%;
+            max-width: 1450px;
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        @media (max-width: 1100px) {
+            .app {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 30px;
+                padding: 30px 0;
+                overflow-y: auto;
+            }
+
+            .left {
+                order: 2;
+                padding: 0;
+            }
+
+            .right {
+                order: 1;
+                width: 100%;
+            }
+
+            .desc {
+                margin: 0 auto 25px;
+                border-left: none;
+                padding: 0 0 12px;
+                border-bottom: 2px solid var(--accent);
+            }
+
+            .ftags {
+                justify-content: center;
+            }
+        }
+
+        .left {
+            padding-left: 10px;
+        }
+
+        .spotlight-reveal {
+            opacity: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spotlight-reveal.visible {
+            opacity: 1;
+        }
+
+        .spotlight-reveal::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -100%;
+            width: 60%;
+            height: 200%;
+            background: linear-gradient(90deg, transparent 0%, rgba(212, 165, 116, 0.15) 50%, transparent 100%);
+            transform: skewX(-15deg);
+        }
+
+        .spotlight-reveal.visible::before {
+            animation: spotlightSweep 1.2s var(--ease) forwards;
+        }
+
+        @keyframes spotlightSweep {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 200%;
+            }
+        }
+
+        .film-reveal .word {
+            display: inline-block;
+            overflow: hidden;
+            margin-right: 12px;
+        }
+
+        .film-reveal .word span {
+            display: inline-block;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            transform: translateY(120%);
+            clip-path: inset(0 100% 0 0);
+        }
+
+        .film-reveal.visible .word span {
+            animation: filmSlide 0.8s var(--ease) forwards;
+        }
+
+        @keyframes filmSlide {
+            0% {
+                transform: translateY(120%);
+                clip-path: inset(0 100% 0 0);
+            }
+
+            50% {
+                clip-path: inset(0 0 0 0);
+            }
+
+            100% {
+                transform: translateY(0);
+                clip-path: inset(0 0 0 0);
+            }
+        }
+
+        .letterbox-wipe {
+            position: relative;
+            clip-path: inset(50% 0 50% 0);
+        }
+
+        .letterbox-wipe.visible {
+            animation: letterboxOpen 1s var(--ease) forwards;
+        }
+
+        @keyframes letterboxOpen {
+            0% {
+                clip-path: inset(50% 0 50% 0);
+            }
+
+            100% {
+                clip-path: inset(0 0 0 0);
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(212, 165, 116, 0.1);
+            border: 1px solid rgba(212, 165, 116, 0.3);
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .title {
+            font-size: clamp(2.8rem, 5.5vw, 4.8rem);
+            font-weight: 900;
+            line-height: 0.95;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            position: relative;
+        }
+
+        .title:hover {
+            filter: brightness(1.2);
+        }
+
+        .title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            transition: width 0.8s var(--ease);
+        }
+
+        .title:hover::after {
+            width: 100%;
+        }
+
+        .desc {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--muted);
+            font-size: 0.85rem;
+            line-height: 1.75;
+            max-width: 480px;
+            margin-bottom: 28px;
+            border-left: 2px solid var(--accent);
+            padding-left: 16px;
+        }
+
+        .desc .hl {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .ftags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .ftag {
+            padding: 6px 12px;
+            border: 1px solid rgba(212, 165, 116, 0.2);
+            border-radius: 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--accent);
+            background: rgba(212, 165, 116, 0.05);
+            opacity: 0;
+            transform: translateY(15px);
+            transition: 0.4s var(--ease);
+        }
+
+        .ftag.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ftag:hover {
+            background: var(--accent);
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .cta {
+            position: relative;
+            padding: 13px 34px;
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0;
+            transition: color 0.3s, box-shadow 0.3s;
+        }
+
+        .cta .fill {
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s var(--ease);
+            z-index: 0;
+        }
+
+        .cta:hover .fill {
+            transform: scaleX(1);
+        }
+
+        .cta:hover {
+            color: #000;
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .cta span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripplePop 0.5s linear;
+        }
+
+        @keyframes ripplePop {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .right {
+            perspective: 1200px;
+        }
+
+        .editor-ui {
+            background: var(--panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.1s var(--ease);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            display: flex;
+            flex-direction: column;
+            height: 520px;
+        }
+
+        @media (max-width: 900px) {
+            .editor-ui {
+                height: auto;
+            }
+        }
+
+        .panel-left {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        .panel-left.visible {
+            animation: slideRight 0.8s var(--ease) forwards;
+        }
+
+        .panel-right {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        .panel-right.visible {
+            animation: slideLeft 0.8s var(--ease) forwards;
+        }
+
+        .panel-bottom {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .panel-bottom.visible {
+            animation: slideUp 0.8s var(--ease) forwards;
+        }
+
+        @keyframes slideRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .top-bar {
+            padding: 8px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--panel-border);
+            font-size: 0.65rem;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .top-bar .tc {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            flex: 1;
+            border-bottom: 1px solid var(--panel-border);
+            min-height: 0;
+        }
+
+        @media (max-width: 900px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .preview-area {
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-img-wrap {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: kenBurns 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes kenBurns {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+
+            50% {
+                transform: scale(1.08) translate(-2%, -1%);
+            }
+
+            100% {
+                transform: scale(1.12) translate(1%, -2%);
+            }
+        }
+
+        .preview-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-circle {
+            width: 55px;
+            height: 55px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .play-circle:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .play-circle svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+            margin-left: 3px;
+        }
+
+        .story-beat {
+            position: absolute;
+            padding: 4px 10px;
+            background: rgba(212, 165, 116, 0.2);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            color: var(--accent);
+            font-weight: 600;
+            opacity: 0;
+            transition: 0.4s;
+        }
+
+        .story-beat.visible {
+            opacity: 1;
+        }
+
+        .beat-intro {
+            top: 10px;
+            left: 10px;
+        }
+
+        .beat-climax {
+            top: 10px;
+            right: 10px;
+        }
+
+        .beat-res {
+            bottom: 10px;
+            left: 10px;
+        }
+
+        .clips-grid {
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 6px;
+            overflow: hidden;
+            background: rgba(10, 10, 15, 0.5);
+        }
+
+        .clip-thumb {
+            background: #1a1a2e;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid transparent;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .clip-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+            display: block;
+        }
+
+        .clip-thumb:hover {
+            border-color: var(--accent);
+            transform: scale(1.02);
+        }
+
+        .clip-thumb .tag {
+            position: absolute;
+            bottom: 3px;
+            left: 3px;
+            font-size: 0.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #fff;
+        }
+
+        .timeline {
+            padding: 10px 14px;
+            background: rgba(5, 5, 10, 0.8);
+        }
+
+        .tl-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--muted);
+        }
+
+        .tc-display {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .story-arc {
+            position: relative;
+            height: 40px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .arc-path {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .arc-path svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .arc-line {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 1.5;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            opacity: 0.6;
+        }
+
+        .story-arc.visible .arc-line {
+            animation: drawArc 2s var(--ease) forwards;
+        }
+
+        @keyframes drawArc {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .arc-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 5px;
+            margin-bottom: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.5rem;
+            color: var(--accent);
+            opacity: 0.7;
+        }
+
+        .tracks {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            position: relative;
+        }
+
+        .track {
+            height: 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .tl-clip {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.45rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            border-right: 1px solid rgba(0, 0, 0, 0.2);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .tl-clip:hover {
+            filter: brightness(1.3);
+        }
+
+        .track-dialog .tl-clip {
+            background: #3a2a1a;
+        }
+
+        .track-narration .tl-clip {
+            background: #2a3a1a;
+        }
+
+        .track-score .tl-clip {
+            background: #1a2a3a;
+        }
+
+        .track-vfx .tl-clip {
+            background: #3a1a2a;
+        }
+
+        .waveform-container {
+            height: 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 0 2px;
+        }
+
+        .wave-bar {
+            flex: 1;
+            background: var(--accent);
+            border-radius: 1px;
+            opacity: 0.4;
+            margin: 0 0.5px;
+            transition: height 0.15s ease, opacity 0.15s ease;
+        }
+
+        .wave-bar.active {
+            opacity: 0.8;
+        }
+
+        .playhead {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0%;
+            width: 2px;
+            background: var(--accent);
+            z-index: 10;
+            box-shadow: 0 0 6px var(--accent);
+        }
+
+        .playhead::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -3px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+        }
+
+        .controls {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid var(--panel-border);
+        }
+
+        .play-btn {
+            width: 10px;
+            height: 10px;
+            border-left: 8px solid var(--muted);
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            cursor: pointer;
+        }
+
+        .play-btn:hover {
+            border-left-color: var(--accent);
+        }
+
+        .prog-track {
+            flex: 1;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .prog-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .ctrl-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--muted);
+        }
+
+        .ctrl-icons {
+            display: flex;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.75rem;
+            margin-left: auto;
+        }
+
+        .carousel {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .c-arrow {
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .c-arrow:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .c-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .c-dot {
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .c-dot.active {
+            background: var(--accent);
+            width: 14px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="grain"></div>
+
+    <main class="app">
+        <div class="left">
+            <div class="badge spotlight-reveal" id="badge">✦ NARRATIVE CRAFT</div>
+            <h1 class="title film-reveal" id="title">
+                <span class="word"><span>STORYTELLING</span></span>
+                <span class="word"><span>EDITOR</span></span>
+            </h1>
+            <div class="desc letterbox-wipe" id="desc">
+                <p>I transform diverse footage into compelling, emotionally resonant narratives. My editing emphasizes
+                    <span class="hl">coherent storylines</span>, deep pacing, and thematic flow.</p>
+                <p style="margin-top:10px;">From short films and documentaries to narrative-driven commercial and
+                    corporate videos, I craft stories that <span class="hl">connect and inspire</span>.</p>
+            </div>
+            <div class="ftags">
+                <span class="ftag">Narrative Structure</span>
+                <span class="ftag">Emotional Pacing</span>
+                <span class="ftag">Soundscape Design</span>
+                <span class="ftag">Visual Flow</span>
+                <span class="ftag">Character Arcs</span>
+            </div>
+            <button class="cta" id="ctaBtn">
+                <div class="fill"></div><span>WATCH DEMO</span>
+            </button>
+        </div>
+
+        <div class="right">
+            <div class="editor-ui" id="editorUI">
+                <div class="top-bar panel-left" id="topBar">
+                    <span>Narrative Storytelling</span>
+                    <span class="tc" id="topTC">00:09:17:08</span>
+                    <span>Concierge</span>
+                </div>
+                <div class="workspace">
+                    <div class="preview-area panel-left" id="previewPanel" style="animation-delay: 0.3s">
+                        <div class="preview-img-wrap">
+                            <img src="https://picsum.photos/seed/story1/800/600" alt="Story Scene" id="storyImg">
+                        </div>
+                        <div class="preview-overlay">
+                            <div class="play-circle"><svg viewBox="0 0 24 24">
+                                    <polygon points="5,3 19,12 5,21"></polygon>
+                                </svg></div>
+                        </div>
+                        <div class="story-beat beat-intro" id="beatIntro">📖 Introduction</div>
+                        <div class="story-beat beat-climax" id="beatClimax">⚡ Climax</div>
+                        <div class="story-beat beat-res" id="beatRes">🔚 Resolution</div>
+                    </div>
+                    <div class="clips-grid panel-right" id="gridPanel" style="animation-delay: 0.5s">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <div class="timeline panel-bottom" id="tlPanel" style="animation-delay: 0.7s">
+                    <div class="tl-header">
+                        <span class="tc-display" id="tlTC">00:09:17:08</span>
+                        <span>Narrative Structure</span>
+                    </div>
+                    <div class="story-arc" id="storyArc">
+                        <div class="arc-path">
+                            <svg viewBox="0 0 500 40" preserveAspectRatio="none">
+                                <path class="arc-line"
+                                    d="M0,35 Q60,35 100,30 Q160,20 200,8 Q250,2 300,8 Q340,20 380,30 Q420,35 500,35" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="arc-labels">
+                        <span>Intro</span><span>Inciting</span><span>Rising</span><span>Climax</span><span>Resolution</span>
+                    </div>
+                    <div class="tracks" id="tracks">
+                        <div class="track track-dialog" id="trackDialog"></div>
+                        <div class="track track-narration" id="trackNarration"></div>
+                        <div class="track track-score" id="trackScore"></div>
+                        <div class="waveform-container" id="waveform"></div>
+                        <div class="playhead" id="playhead"></div>
+                    </div>
+                </div>
+                <div class="controls panel-bottom" id="ctrlPanel" style="animation-delay: 0.9s">
+                    <div class="play-btn" id="playBtn"></div>
+                    <div class="prog-track">
+                        <div class="prog-fill" id="progFill"></div>
+                    </div>
+                    <span class="ctrl-text" id="ctrlTime">00:00:00</span>
+                    <div class="ctrl-icons"><span>⚙</span><span>↱</span></div>
+                </div>
+            </div>
+            <div class="carousel">
+                <div class="c-arrow">‹</div>
+                <div class="c-dots" id="dots">
+                    <div class="c-dot active" data-i="0"></div>
+                    <div class="c-dot" data-i="1"></div>
+                    <div class="c-dot" data-i="2"></div>
+                    <div class="c-dot" data-i="3"></div>
+                    <div class="c-dot" data-i="4"></div>
+                </div>
+                <div class="c-arrow">›</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /* ===== Entrance Animations ===== */
+        const badge = document.getElementById('badge');
+        const title = document.getElementById('title');
+        const desc = document.getElementById('desc');
+        const ftags = document.querySelectorAll('.ftag');
+        const cta = document.getElementById('ctaBtn');
+        setTimeout(() => badge.classList.add('visible'), 300);
+        setTimeout(() => title.classList.add('visible'), 600);
+        setTimeout(() => desc.classList.add('visible'), 900);
+        ftags.forEach((t, i) => setTimeout(() => t.classList.add('visible'), 1200 + i * 100));
+        setTimeout(() => { cta.classList.add('visible'); cta.style.opacity = 1; }, 1600);
+
+        /* ===== Magnetic CTA ===== */
+        cta.addEventListener('mousemove', e => {
+            const r = cta.getBoundingClientRect();
+            cta.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.15}px, ${(e.clientY - r.top - r.height / 2) * 0.15}px)`;
+        });
+        cta.addEventListener('mouseleave', () => cta.style.transform = 'translate(0,0)');
+        cta.addEventListener('click', e => {
+            const r = cta.getBoundingClientRect();
+            const rip = document.createElement('div'); rip.className = 'ripple';
+            const sz = Math.max(r.width, r.height);
+            rip.style.cssText = `width:${sz}px;height:${sz}px;left:${e.clientX - r.left - sz / 2}px;top:${e.clientY - r.top - sz / 2}px;`;
+            cta.appendChild(rip); setTimeout(() => rip.remove(), 500);
+        });
+
+        /* ===== 3D Tilt ===== */
+        const ui = document.getElementById('editorUI');
+        ui.parentElement.addEventListener('mousemove', e => {
+            const r = ui.parentElement.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width - 0.5;
+            const y = (e.clientY - r.top) / r.height - 0.5;
+            ui.style.transform = `rotateY(${x * 4}deg) rotateX(${-y * 4}deg)`;
+        });
+        ui.parentElement.addEventListener('mouseleave', () => ui.style.transform = 'rotateY(0) rotateX(0)');
+
+        /* ===== Populate Clips Grid with Reliable Images ===== */
+        const gridData = [
+            { seed: 'scene1', tag: 'Scene 1' },
+            { seed: 'scene2', tag: 'Scene 2' },
+            { seed: 'scene3', tag: 'Scene 3' },
+            { seed: 'scene4', tag: 'Scene 4' },
+            { seed: 'scene5', tag: 'Scene 5' },
+            { seed: 'scene6', tag: 'Scene 6' }
+        ];
+        const gridEl = document.getElementById('clipsGrid');
+        gridData.forEach((d, i) => {
+            const div = document.createElement('div');
+            div.className = 'clip-thumb';
+            div.innerHTML = `<img src="https://picsum.photos/seed/${d.seed}/300/200" alt="${d.tag}" onerror="this.src='https://via.placeholder.com/300x200/1a1a2e/d4a574?text=${d.tag}'"><span class="tag">${d.tag}</span>`;
+            gridEl.appendChild(div);
+        });
+
+        /* ===== Populate Timeline Clips ===== */
+        const tlClipsData = {
+            trackDialog: [{ w: 20, c: 'Dlg A' }, { w: 15, c: 'Dlg B' }, { w: 25, c: 'Dlg A' }, { w: 10, c: 'Dlg B' }, { w: 15, c: 'Dlg A' }, { w: 15, c: 'Dlg B' }],
+            trackNarration: [{ w: 30, c: 'Narration' }, { w: 20, c: 'Voiceover' }, { w: 25, c: 'Narration' }, { w: 25, c: 'Voiceover' }],
+            trackScore: [{ w: 100, c: 'Score Track 1' }]
+        };
+        Object.entries(tlClipsData).forEach(([id, clips]) => {
+            const el = document.getElementById(id);
+            clips.forEach(c => {
+                const clip = document.createElement('div');
+                clip.className = 'tl-clip'; clip.style.width = c.w + '%';
+                clip.textContent = c.c; el.appendChild(clip);
+            });
+        });
+
+        /* ===== Generate Waveform Bars ===== */
+        const waveformEl = document.getElementById('waveform');
+        const barCount = 80;
+        for (let i = 0; i < barCount; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'wave-bar';
+            const h = Math.random() * 12 + 2;
+            bar.style.height = h + 'px';
+            bar.dataset.baseH = h;
+            waveformEl.appendChild(bar);
+        }
+
+        /* ===== Simulation: Story Arc Progression ===== */
+        const playhead = document.getElementById('playhead');
+        const progFill = document.getElementById('progFill');
+        const tlTC = document.getElementById('tlTC');
+        const topTC = document.getElementById('topTC');
+        const ctrlTime = document.getElementById('ctrlTime');
+        const beatIntro = document.getElementById('beatIntro');
+        const beatClimax = document.getElementById('beatClimax');
+        const beatRes = document.getElementById('beatRes');
+        const storyImg = document.getElementById('storyImg');
+
+        const storyScenes = [
+            'https://picsum.photos/seed/story1/800/600',
+            'https://picsum.photos/seed/story2/800/600',
+            'https://picsum.photos/seed/story3/800/600',
+            'https://picsum.photos/seed/story4/800/600'
+        ];
+
+        let progress = 0;
+        let isPlaying = true;
+        let currentScene = 0;
+        let waveInterval;
+
+        function formatTC(pct) {
+            const totalSec = 560;
+            const sec = Math.floor((pct / 100) * totalSec);
+            const m = String(Math.floor(sec / 60)).padStart(2, '0');
+            const s = String(sec % 60).padStart(2, '0');
+            const f = String(Math.floor((pct % 1) * 30)).padStart(2, '0');
+            return `00:${m}:${s}:${f}`;
+        }
+
+        function updateStoryBeats(pct) {
+            beatIntro.classList.toggle('visible', pct < 25);
+            beatClimax.classList.toggle('visible', pct >= 45 && pct < 70);
+            beatRes.classList.toggle('visible', pct >= 75);
+            let sceneIdx = pct < 25 ? 0 : pct < 50 ? 1 : pct < 75 ? 2 : 3;
+            if (sceneIdx !== currentScene) {
+                currentScene = sceneIdx;
+                storyImg.style.opacity = 0;
+                setTimeout(() => {
+                    storyImg.src = storyScenes[sceneIdx];
+                    storyImg.style.opacity = 1;
+                }, 300);
+            }
+        }
+
+        function animateWaveform() {
+            const bars = document.querySelectorAll('.wave-bar');
+            bars.forEach(bar => {
+                const base = parseFloat(bar.dataset.baseH);
+                const variation = Math.random() * 8 - 4;
+                const newH = Math.max(2, Math.min(16, base + variation));
+                bar.style.height = newH + 'px';
+                bar.classList.toggle('active', newH > base + 2);
+            });
+        }
+
+        function tick() {
+            if (!isPlaying) return;
+            progress += 0.06;
+            if (progress > 100) progress = 0;
+            playhead.style.left = progress + '%';
+            progFill.style.width = progress + '%';
+            const tc = formatTC(progress);
+            tlTC.textContent = tc;
+            topTC.textContent = tc;
+            ctrlTime.textContent = tc;
+            updateStoryBeats(progress);
+            requestAnimationFrame(tick);
+        }
+
+        waveInterval = setInterval(animateWaveform, 150);
+        setTimeout(() => {
+            tick();
+            document.getElementById('storyArc').classList.add('visible');
+            setTimeout(() => beatIntro.classList.add('visible'), 500);
+        }, 2500);
+
+        document.getElementById('playBtn').addEventListener('click', function () {
+            isPlaying = !isPlaying;
+            if (isPlaying) tick();
+            this.style.borderLeftColor = isPlaying ? 'var(--accent)' : '';
+        });
+
+        /* ===== Carousel ===== */
+        document.querySelectorAll('.c-dot').forEach(d => d.addEventListener('click', () => {
+            document.querySelectorAll('.c-dot').forEach((dot, i) => dot.classList.toggle('active', i === +d.dataset.i));
+        }));
+
+        /* ===== Canvas: Warm Floating Embers ===== */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, particles = [], mouse = { x: -1000, y: -1000 };
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        class Ember {
+            constructor() {
+                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = -(Math.random() * 0.3 + 0.1);
+                this.s = Math.random() * 2 + 0.5;
+                this.a = Math.random() * 0.4 + 0.1;
+                this.warmth = Math.random();
+            }
+            update() {
+                this.x += this.vx + Math.sin(Date.now() * 0.001 + this.y * 0.01) * 0.1;
+                this.y += this.vy;
+                if (this.y < -10) { this.y = h + 10; this.x = Math.random() * w; }
+                if (this.x < 0 || this.x > w) this.vx *= -1;
+            }
+            draw() {
+                const r = Math.floor(180 + this.warmth * 75);
+                const g = Math.floor(100 + this.warmth * 65);
+                const b = Math.floor(50 + (1 - this.warmth) * 100);
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${r},${g},${b},${this.a})`; ctx.fill();
+            }
+        }
+        for (let i = 0; i < 90; i++) particles.push(new Ember());
+        function anim() {
+            ctx.clearRect(0, 0, w, h);
+            particles.forEach(p => { p.update(); p.draw(); });
+            ctx.strokeStyle = 'rgba(212,165,116,0.03)'; ctx.lineWidth = 0.5;
+            for (let i = 0; i < particles.length; i++) for (let j = i + 1; j < particles.length; j++) {
+                const d = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+                if (d < 120) { ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); }
+            }
+            requestAnimationFrame(anim);
+        }
+        anim();
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    </script>
+</body>
+
+</html>

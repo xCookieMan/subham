@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Work</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050505;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            padding: 70px 90px;
+            overflow-x: hidden;
+        }
+
+        /* ===== CINEMATIC NOISE OVERLAY ===== */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px, 60px 60px;
+            background-position: 0 0, 30px 30px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.4;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+
+        .header h1::after {
+            content: "";
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, #ff6b35, transparent);
+            transition: width 0.4s ease;
+        }
+
+        .header:hover h1::after {
+            width: 100%;
+        }
+
+        .header .subtitle {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #ff6b35;
+            margin-top: 5px;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+
+        .header:hover .subtitle {
+            opacity: 1;
+            letter-spacing: 3px;
+        }
+
+        /* ===== FILTER TABS ===== */
+        .filter-bar {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 26px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 7px 14px;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #666;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            border-radius: 18px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 18px;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+
+        .filter-btn:hover::before {
+            transform: scaleX(1);
+        }
+
+        .filter-btn:hover {
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .filter-btn.active {
+            color: #fff;
+            border: 1px solid #ff6b35;
+            background: rgba(255, 107, 53, 0.08);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.15);
+        }
+
+        .filter-btn.active::before {
+            transform: scaleX(1);
+        }
+
+        /* ===== GRID ===== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            perspective: 1000px;
+        }
+
+        /* ===== CARD - CINEMATIC HOVER ===== */
+        .card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 16 / 10;
+            background: #111;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transform-style: preserve-3d;
+        }
+
+        /* 🎬 MAIN HOVER EFFECT - Lift + Glow + 3D Tilt */
+        .card:hover {
+            transform: translateY(-8px) rotateX(2deg) rotateY(-2deg);
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 107, 53, 0.4),
+                0 0 50px rgba(255, 107, 53, 0.25),
+                0 0 100px rgba(255, 107, 53, 0.1);
+            border-color: rgba(255, 107, 53, 0.3);
+            z-index: 10;
+        }
+
+        /* 🖼️ Parallax Image Zoom */
+        .card-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+            transform: scale(1);
+            will-change: transform;
+        }
+
+        .card:hover .card-bg {
+            transform: scale(1.15) translateZ(20px);
+            filter: brightness(0.7) contrast(1.1);
+        }
+
+        /* 🌑 Dynamic Gradient Overlay */
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    transparent 0%,
+                    rgba(5, 5, 5, 0.2) 30%,
+                    rgba(5, 5, 5, 0.9) 100%);
+            opacity: 0.7;
+            transition: opacity 0.4s ease;
+            z-index: 1;
+        }
+
+        .card:hover .card-overlay {
+            opacity: 0.95;
+        }
+
+        /* ✨ Animated Top Accent Line */
+        .top-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6b35, #ff8c5a, transparent);
+            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 3;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+
+        .card:hover .top-accent {
+            width: 100%;
+        }
+
+        /* ▶️ Play Button with Ripple Effect */
+        .play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 4;
+            overflow: visible;
+        }
+
+        .play-btn::before {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: #ff6b35;
+            border-bottom-color: #ff6b35;
+            animation: none;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .card:hover .play-btn {
+            transform: translate(-50%, -50%) scale(1.15);
+            border-color: rgba(255, 107, 53, 0.9);
+            background: rgba(255, 107, 53, 0.2);
+            box-shadow:
+                0 0 0 6px rgba(255, 107, 53, 0.1),
+                0 0 35px rgba(255, 107, 53, 0.4);
+        }
+
+        .card:hover .play-btn::before {
+            animation: spin 1.2s linear infinite;
+            opacity: 1;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .play-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: rgba(255, 255, 255, 0.85);
+            margin-left: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card:hover .play-btn svg {
+            fill: #fff;
+            transform: scale(1.1);
+        }
+
+        /* 🎬 Ripple Effect on Click */
+        .play-btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.4) 0%, transparent 70%);
+            transform: scale(0);
+            transition: transform 0.5s ease;
+            opacity: 0;
+        }
+
+        .card:active .play-btn::after {
+            transform: scale(2.5);
+            opacity: 1;
+            transition: transform 0.3s ease, opacity 0.2s ease;
+        }
+
+        /* 📝 Card Info with Slide-Up Animation */
+        .card-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 22px 20px 20px;
+            z-index: 3;
+            transform: translateY(8px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card:hover .card-info {
+            transform: translateY(0);
+        }
+
+        .card-num {
+            font-size: 10px;
+            font-weight: 600;
+            color: #ff6b35;
+            letter-spacing: 1.5px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+            color: #fff;
+            transition: all 0.3s ease;
+            position: relative;
+            display: inline-block;
+        }
+
+        .card-title::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #ff6b35;
+            transition: width 0.3s ease;
+        }
+
+        .card:hover .card-title {
+            color: #ff6b35;
+            letter-spacing: 1.5px;
+        }
+
+        .card:hover .card-title::after {
+            width: 100%;
+        }
+
+        .card-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 400;
+            transition: all 0.3s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transform: translateY(5px);
+        }
+
+        .card:hover .card-desc {
+            color: rgba(255, 255, 255, 0.9);
+            max-height: 30px;
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.4s ease 0.1s;
+        }
+
+        /* 🎴 Card Entry Animation */
+        .card {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: cardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .card:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .card:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+
+        .card:nth-child(6) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes cardIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card.filter-out {
+            animation: cardOut 0.3s ease forwards;
+        }
+
+        @keyframes cardOut {
+            to {
+                opacity: 0;
+                transform: scale(0.92) translateY(10px);
+            }
+        }
+
+        /* ===== VIDEO MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            width: min(90vw, 960px);
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow:
+                0 40px 100px rgba(0, 0, 0, 0.7),
+                0 0 0 1px rgba(255, 107, 53, 0.2),
+                0 0 80px rgba(255, 107, 53, 0.15);
+            transform: scale(0.92) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-content video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #fff;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-close:hover {
+            background: #ff6b35;
+            border-color: #ff6b35;
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 0 25px rgba(255, 107, 53, 0.4);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            body {
+                padding: 40px 20px;
+            }
+
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card:hover {
+                transform: translateY(-4px);
+            }
+        }
+
+        /* ===== MOUSE GLOW EFFECT (Optional Premium Touch) ===== */
+        .card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: radial-gradient(200px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    rgba(255, 107, 53, 0.15),
+                    transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .card:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>MY WORK</h1>
+        <div class="subtitle">SELECTED PROJECTS</div>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" data-filter="all">ALL</button>
+        <button class="filter-btn" data-filter="film">FILM</button>
+        <button class="filter-btn" data-filter="commercial">COMMERCIAL</button>
+        <button class="filter-btn" data-filter="music-video">MUSIC VIDEO</button>
+        <button class="filter-btn" data-filter="documentary">DOCUMENTARY</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <!-- VIDEO MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">✕</button>
+            <video id="modalVideo" controls playsinline preload="metadata"></video>
+        </div>
+    </div>
+
+    <script>
+        const projects = [
+            {
+                id: 1, num: "01", title: "THE LAST LOOK",
+                desc: "Cinematic Short Film",
+                cat: "film",
+                img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=380&fit=crop",
+                video: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+            },
+            {
+                id: 2, num: "02", title: "NIGHT DRIVE",
+                desc: "Commercial Edit",
+                cat: "commercial",
+                img: "https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=600&h=380&fit=crop",
+                video: "https://www.w3schools.com/html/mov_bbb.mp4"
+            },
+            {
+                id: 3, num: "03", title: "BEYOND LIMITS",
+                desc: "Motivation Reel",
+                cat: "commercial",
+                img: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&h=380&fit=crop",
+                video: "https://media.w3.org/2010/05/sintel/trailer.mp4"
+            },
+            {
+                id: 4, num: "04", title: "LOST IN TIME",
+                desc: "Travel Film",
+                cat: "film",
+                img: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=380&fit=crop",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+            },
+            {
+                id: 5, num: "05", title: "URBAN FREEDOM",
+                desc: "Music Video",
+                cat: "music-video",
+                img: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&h=380&fit=crop",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+            },
+            {
+                id: 6, num: "06", title: "FRAME BY FRAME",
+                desc: "Documentary",
+                cat: "documentary",
+                img: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=600&h=380&fit=crop",
+                video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+            }
+        ];
+
+        const grid = document.getElementById("grid");
+        const modal = document.getElementById("modal");
+        const modalVideo = document.getElementById("modalVideo");
+        const modalClose = document.getElementById("modalClose");
+
+        // 🎨 Mouse Glow Effect for Cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        function render(filter = "all") {
+            const items = filter === "all" ? projects : projects.filter(p => p.cat === filter);
+            document.querySelectorAll(".card").forEach(c => c.classList.add("filter-out"));
+
+            setTimeout(() => {
+                grid.innerHTML = "";
+                items.forEach((p, i) => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.style.animationDelay = `${i * 0.06}s`;
+
+                    // Add mousemove listener for glow effect
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        card.style.setProperty('--mouse-x', `${x}px`);
+                        card.style.setProperty('--mouse-y', `${y}px`);
+                    });
+
+                    card.innerHTML = `
+                        <div class="card-bg" style="background-image:url('${p.img}')"></div>
+                        <div class="card-overlay"></div>
+                        <div class="top-accent"></div>
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-num">${p.num}</div>
+                            <div class="card-title">${p.title}</div>
+                            <div class="card-desc">${p.desc}</div>
+                        </div>
+                    `;
+                    card.addEventListener("click", () => openModal(p.video));
+                    grid.appendChild(card);
+                });
+            }, 260);
+        }
+
+        function openModal(videoUrl) {
+            modalVideo.src = videoUrl;
+            modal.classList.add("active");
+            document.body.style.overflow = "hidden";
+            modalVideo.play().catch(() => { });
+        }
+
+        function closeModal() {
+            modal.classList.remove("active");
+            document.body.style.overflow = "";
+            setTimeout(() => {
+                modalVideo.pause();
+                modalVideo.src = "";
+            }, 300);
+        }
+
+        modalClose.addEventListener("click", closeModal);
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeModal();
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && modal.classList.contains("active")) closeModal();
+        });
+
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                render(btn.dataset.filter);
+            });
+        });
+
+        render();
+    </script>
+</body>
+
+</html>

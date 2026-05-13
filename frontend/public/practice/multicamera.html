@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Camera Editor | ProCut Studio</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030308;
+            --panel: rgba(14, 14, 22, 0.85);
+            --panel-light: rgba(30, 30, 45, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #4facfe;
+            --accent-glow: rgba(79, 172, 254, 0.35);
+            --cam-active: #00d1a0;
+            --text: #f0f4f8;
+            --muted: #7a8499;
+            --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.35;
+        }
+
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 999;
+            background-image: url("image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            mix-blend-mode: overlay;
+        }
+
+        .app {
+            position: relative;
+            z-index: 10;
+            width: 94%;
+            max-width: 1450px;
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        @media (max-width: 1100px) {
+            .app {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 30px;
+                padding: 30px 0;
+                overflow-y: auto;
+            }
+
+            .left {
+                order: 2;
+                padding: 0;
+            }
+
+            .right {
+                order: 1;
+                width: 100%;
+            }
+
+            .desc {
+                margin: 0 auto 25px;
+                border-left: none;
+                padding: 0 0 12px;
+                border-bottom: 2px solid var(--accent);
+            }
+
+            .ftags {
+                justify-content: center;
+            }
+        }
+
+        .left {
+            padding-left: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(79, 172, 254, 0.1);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            opacity: 0;
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 5vw, 4.2rem);
+            font-weight: 900;
+            line-height: 1.05;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            opacity: 0;
+        }
+
+        .title:hover::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            background: linear-gradient(105deg, transparent 40%, rgba(79, 172, 254, 0.12) 50%, transparent 60%);
+            background-size: 200% 100%;
+            opacity: 1;
+            border-radius: 8px;
+            animation: shimmer 2.5s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .desc {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--muted);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            max-width: 460px;
+            margin-bottom: 28px;
+            border-left: 2px solid var(--accent);
+            padding-left: 16px;
+            opacity: 0;
+        }
+
+        .desc .hl {
+            color: var(--accent);
+            font-weight: 600;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .ftags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 30px;
+        }
+
+        .ftag {
+            padding: 6px 12px;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+            border-radius: 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--accent);
+            background: rgba(79, 172, 254, 0.05);
+            opacity: 0;
+            transition: background 0.3s, color 0.3s, transform 0.3s var(--ease), box-shadow 0.3s;
+        }
+
+        .ftag:hover {
+            background: var(--accent);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .cta {
+            position: relative;
+            padding: 13px 34px;
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0;
+            transition: color 0.3s, box-shadow 0.3s;
+        }
+
+        .cta .fill {
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s var(--ease);
+            z-index: 0;
+        }
+
+        .cta:hover .fill {
+            transform: scaleX(1);
+        }
+
+        .cta:hover {
+            color: #000;
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .cta span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .anim-in {
+            animation: fadeInUp 0.7s var(--ease) forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .right {
+            perspective: 1000px;
+        }
+
+        .editor-card {
+            background: var(--panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.15s var(--ease);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .editor-card.visible {
+            animation: cardReveal 0.8s var(--ease) forwards;
+        }
+
+        @keyframes cardReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .top-bar {
+            padding: 8px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.65rem;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .top-bar .title-text {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .top-bar .tc {
+            color: var(--accent);
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            height: 240px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        @media (max-width: 800px) {
+            .workspace {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .node-panel {
+                display: none;
+            }
+        }
+
+        .viewer {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .viewer img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+            transition: opacity 0.25s ease;
+        }
+
+        .viewer .overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+        }
+
+        .viewer .play-circle {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .viewer .play-circle:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .viewer .play-circle svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            margin-left: 2px;
+        }
+
+        .cam-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 4px 10px;
+            background: rgba(0, 209, 160, 0.2);
+            border: 1px solid var(--cam-active);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--cam-active);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cam-badge .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--cam-active);
+            border-radius: 50%;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .node-panel {
+            background: rgba(10, 10, 15, 0.8);
+            padding: 12px;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .node {
+            background: var(--panel-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.6rem;
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .node-header span {
+            color: var(--accent);
+        }
+
+        .node-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #1a1a2e;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            overflow: hidden;
+        }
+
+        .node-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .node-status {
+            display: flex;
+            justify-content: space-between;
+            color: var(--muted);
+            font-size: 0.55rem;
+        }
+
+        .node-status .on {
+            color: var(--cam-active);
+        }
+
+        .node-connector {
+            height: 12px;
+            width: 1px;
+            background: var(--border);
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .node-connector::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            animation: dataFlow 2s linear infinite;
+        }
+
+        @keyframes dataFlow {
+            0% {
+                top: -100%;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+
+        .timeline {
+            padding: 10px 14px;
+            background: rgba(5, 5, 10, 0.6);
+        }
+
+        .tl-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--muted);
+        }
+
+        .tc-display {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .tracks {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+        }
+
+        .track {
+            height: 26px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            gap: 0;
+        }
+
+        .clip {
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            flex-shrink: 0;
+        }
+
+        .clip img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.45;
+        }
+
+        .clip span {
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .clip:hover {
+            transform: scaleY(1.08);
+            z-index: 2;
+        }
+
+        .clip.active {
+            border-color: var(--cam-active);
+            box-shadow: 0 0 8px rgba(0, 209, 160, 0.3);
+        }
+
+        .clip.active::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 209, 160, 0.18);
+            z-index: 0;
+        }
+
+        .track-1 .clip {
+            background: #2d1b4e;
+        }
+
+        .track-2 .clip {
+            background: #1b3a4b;
+        }
+
+        .track-3 .clip {
+            background: #4b1b2a;
+        }
+
+        .track-4 .clip {
+            background: #3a4b1b;
+        }
+
+        .playhead {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0%;
+            width: 2px;
+            background: var(--accent);
+            z-index: 10;
+            box-shadow: 0 0 8px var(--accent);
+            transition: left 0.05s linear;
+        }
+
+        .playhead::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -3.5px;
+            width: 9px;
+            height: 9px;
+            background: var(--accent);
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+        }
+
+        .controls {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .play-btn {
+            width: 12px;
+            height: 12px;
+            border-left: 10px solid var(--muted);
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .play-btn:hover {
+            border-left-color: var(--accent);
+        }
+
+        .prog-track {
+            flex: 1;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .prog-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.05s linear;
+        }
+
+        .ctrl-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+        }
+
+        .ctrl-icons {
+            display: flex;
+            gap: 10px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin-left: auto;
+        }
+
+        .ctrl-icons span {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .ctrl-icons span:hover {
+            color: var(--accent);
+        }
+
+        .carousel {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .c-arrow {
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            cursor: pointer;
+            transition: 0.2s;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .c-arrow:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .c-dots {
+            display: flex;
+            gap: 7px;
+        }
+
+        .c-dot {
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .c-dot.active {
+            background: var(--accent);
+            width: 16px;
+            border-radius: 3px;
+            box-shadow: 0 0 6px var(--accent-glow);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="grain"></div>
+
+    <main class="app">
+        <div class="left">
+            <div class="badge" id="badge">✦ LIVE PRODUCTION SUITE</div>
+            <h1 class="title" id="title">MULTI CAMERA EDITOR</h1>
+            <p class="desc" id="desc">
+                I offer advanced multi-camera synchronization and editing, creating dynamic sequences from multiple
+                synchronized sources. Specializing in <span class="hl">high-speed precision cuts</span> for events,
+                concerts, and cinematic productions.
+            </p>
+            <div class="ftags" id="ftags">
+                <span class="ftag">Multi-Cam Sync</span>
+                <span class="ftag">Real-Time Cutting</span>
+                <span class="ftag">Precision Pacing</span>
+                <span class="ftag">Narrative Choice</span>
+                <span class="ftag">Cam Management</span>
+            </div>
+            <button class="cta" id="ctaBtn">
+                <div class="fill"></div><span>WATCH DEMO</span>
+            </button>
+        </div>
+
+        <div class="right">
+            <div class="editor-card" id="editorCard">
+                <div class="top-bar">
+                    <span class="title-text">Multi Camera Editor</span>
+                    <span class="tc" id="topTC">00:00:00:00</span>
+                    <span>Composite</span>
+                </div>
+                <div class="workspace">
+                    <div class="viewer">
+                        <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+                            alt="Main Feed" id="mainFeed">
+                        <div class="overlay">
+                            <div class="play-circle"><svg viewBox="0 0 24 24">
+                                    <polygon points="5,3 19,12 5,21"></polygon>
+                                </svg></div>
+                        </div>
+                        <div class="cam-badge">
+                            <div class="dot"></div><span id="camLabel">CAM 1: WIDE SHOT</span>
+                        </div>
+                    </div>
+                    <div class="node-panel">
+                        <div class="node">
+                            <div class="node-header">Multi Cam Server <span>●</span></div>
+                            <div class="node-img"><img
+                                    src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                                    alt=""></div>
+                            <div class="node-status"><span>4 Sources</span><span class="on">Synced</span></div>
+                        </div>
+                        <div class="node-connector"></div>
+                        <div class="node">
+                            <div class="node-header">M-CE <span>Selector</span></div>
+                            <div class="node-img"
+                                style="display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;font-size:0.9rem;">
+                                M-CE</div>
+                            <div class="node-status"><span>Auto-Switch</span><span class="on">Active</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline">
+                    <div class="tl-header">
+                        <span class="tc-display" id="tlTC">00:00:00:00</span>
+                        <span>Master Sequence</span>
+                    </div>
+                    <div class="tracks" id="tracksContainer">
+                        <div class="track track-1" id="track1"></div>
+                        <div class="track track-2" id="track2"></div>
+                        <div class="track track-3" id="track3"></div>
+                        <div class="track track-4" id="track4"></div>
+                        <div class="playhead" id="playhead"></div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <div class="play-btn" id="playBtn"></div>
+                    <div class="prog-track" id="progTrack">
+                        <div class="prog-fill" id="progFill"></div>
+                    </div>
+                    <span class="ctrl-text" id="ctrlTime">00:00:00</span>
+                    <div class="ctrl-icons"><span></span><span></span></div>
+                </div>
+            </div>
+            <div class="carousel">
+                <div class="c-arrow">‹</div>
+                <div class="c-dots" id="dots">
+                    <div class="c-dot active" data-i="0"></div>
+                    <div class="c-dot" data-i="1"></div>
+                    <div class="c-dot" data-i="2"></div>
+                    <div class="c-dot" data-i="3"></div>
+                    <div class="c-dot" data-i="4"></div>
+                </div>
+                <div class="c-arrow">›</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /* ===== Entrance Animations (Staggered) ===== */
+        const animEls = [
+            document.getElementById('editorCard'),
+            document.getElementById('badge'),
+            document.getElementById('title'),
+            document.getElementById('desc'),
+            ...document.querySelectorAll('.ftag'),
+            document.getElementById('ctaBtn')
+        ];
+        const delays = [100, 250, 400, 550, 700, 790, 880, 970, 1060, 1200];
+        animEls.forEach((el, i) => setTimeout(() => el.classList.add('anim-in'), delays[i] || delays[delays.length - 1]));
+
+        /* ===== Timeline Data: Each clip has { start%, width%, camName, imgUrl } ===== */
+        const TOTAL_DURATION = 120; // seconds
+        const camImages = {
+            'Wide Shot': 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+            'Singer Close': 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+            'Drum Cam': 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+            'Crowd Shot': 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+        };
+
+        // Timeline layout: sequential clips across tracks, each clip maps to a time range
+        // Track 1 (Drum/Crowd/Singer)  → clips at specific time windows
+        // Track 2 (Wide/Singer)         → main camera track
+        // Track 3 (Drum/Crowd)          → alternate angles
+        // Track 4 (Audio)               → full duration
+
+        const timelineClips = [
+            // Track 2 clips (primary)
+            { track: 2, start: 0, duration: 25, cam: 'Wide Shot' },
+            { track: 2, start: 25, duration: 20, cam: 'Singer Close' },
+            { track: 2, start: 45, duration: 30, cam: 'Wide Shot' },
+            { track: 2, start: 75, duration: 25, cam: 'Singer Close' },
+            { track: 2, start: 100, duration: 20, cam: 'Wide Shot' },
+            // Track 1 clips
+            { track: 1, start: 0, duration: 15, cam: 'Drum Cam' },
+            { track: 1, start: 15, duration: 30, cam: 'Crowd Shot' },
+            { track: 1, start: 45, duration: 25, cam: 'Singer Close' },
+            { track: 1, start: 70, duration: 30, cam: 'Drum Cam' },
+            { track: 1, start: 100, duration: 20, cam: 'Crowd Shot' },
+            // Track 3 clips
+            { track: 3, start: 0, duration: 20, cam: 'Drum Cam' },
+            { track: 3, start: 20, duration: 35, cam: 'Crowd Shot' },
+            { track: 3, start: 55, duration: 30, cam: 'Drum Cam' },
+            { track: 3, start: 85, duration: 35, cam: 'Crowd Shot' },
+            // Track 4 (Audio — always active)
+            { track: 4, start: 0, duration: 120, cam: 'Audio Master' }
+        ];
+
+        /* ===== Build Timeline DOM from Data ===== */
+        function buildTimeline() {
+            const tracks = { 1: document.getElementById('track1'), 2: document.getElementById('track2'), 3: document.getElementById('track3'), 4: document.getElementById('track4') };
+
+            // Group clips by track
+            const byTrack = {};
+            for (const t of [1, 2, 3, 4]) byTrack[t] = [];
+            timelineClips.forEach(c => byTrack[c.track].push(c));
+
+            for (const [trackNum, clips] of Object.entries(byTrack)) {
+                const container = tracks[trackNum];
+                // Sort by start time
+                clips.sort((a, b) => a.start - b.start);
+
+                for (const clip of clips) {
+                    const el = document.createElement('div');
+                    el.className = 'clip';
+                    el.style.width = (clip.duration / TOTAL_DURATION * 100) + '%';
+                    el.style.marginLeft = (clip.start / TOTAL_DURATION * 100) + '%';
+                    el.dataset.cam = clip.cam;
+                    el.dataset.start = clip.start;
+                    el.dataset.end = clip.start + clip.duration;
+
+                    const isAudio = clip.cam === 'Audio Master';
+                    el.innerHTML = isAudio
+                        ? `<span>🎵 Audio Master</span>`
+                        : `<img src="${camImages[clip.cam]}" alt="${clip.cam}"><span>${clip.cam}</span>`;
+
+                    // Click clip to jump playhead
+                    el.addEventListener('click', () => {
+                        playheadPercent = (clip.start / TOTAL_DURATION) * 100;
+                        updateUI(playheadPercent);
+                    });
+
+                    container.appendChild(el);
+                }
+            }
+        }
+        buildTimeline();
+
+        /* ===== Playback Engine ===== */
+        const playhead = document.getElementById('playhead');
+        const mainFeed = document.getElementById('mainFeed');
+        const camLabel = document.getElementById('camLabel');
+        const topTC = document.getElementById('topTC');
+        const tlTC = document.getElementById('tlTC');
+        const progFill = document.getElementById('progFill');
+        const ctrlTime = document.getElementById('ctrlTime');
+        const tracksContainer = document.getElementById('tracksContainer');
+
+        let playheadPercent = 0;
+        let isPlaying = false;
+        let currentCam = 'Wide Shot';
+        let animFrame = null;
+
+        // Find which clip is active at a given time (seconds)
+        function getActiveClipAtTime(timeSec) {
+            // Priority: Track 2 (main) > Track 1 > Track 3 > Track 4
+            for (const trackNum of [2, 1, 3, 4]) {
+                for (const clip of timelineClips) {
+                    if (clip.track === trackNum && timeSec >= clip.start && timeSec < clip.start + clip.duration) {
+                        return clip;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Find which track's clip is under the playhead visually
+        function getClipsUnderPlayhead(percent) {
+            const timeSec = (percent / 100) * TOTAL_DURATION;
+            const result = {};
+            for (const clip of timelineClips) {
+                if (timeSec >= clip.start && timeSec < clip.start + clip.duration) {
+                    if (!result[clip.track]) result[clip.track] = clip;
+                }
+            }
+            return result;
+        }
+
+        function formatTC(seconds) {
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(Math.floor(seconds % 60)).padStart(2, '0');
+            const f = String(Math.floor((seconds % 1) * 30)).padStart(2, '0');
+            return `00:${m}:${s}:${f}`;
+        }
+
+        function updateUI(percent) {
+            // Clamp
+            if (percent < 0) percent = 0;
+            if (percent > 100) percent = 100;
+            playheadPercent = percent;
+
+            // Update playhead & progress bar
+            playhead.style.left = percent + '%';
+            progFill.style.width = percent + '%';
+
+            // Timecodes
+            const timeSec = (percent / 100) * TOTAL_DURATION;
+            const tcStr = formatTC(timeSec);
+            tlTC.textContent = tcStr;
+            topTC.textContent = '00:' + tcStr.slice(3);
+            ctrlTime.textContent = tcStr.slice(0, 8);
+
+            // Find active clip → update main viewer
+            const activeClip = getActiveClipAtTime(timeSec);
+            if (activeClip && activeClip.cam !== currentCam && activeClip.cam !== 'Audio Master') {
+                currentCam = activeClip.cam;
+                mainFeed.style.opacity = 0;
+                setTimeout(() => {
+                    mainFeed.src = camImages[activeClip.cam];
+                    mainFeed.style.opacity = 0.9;
+                    const camNum = { 'Wide Shot': 1, 'Singer Close': 2, 'Drum Cam': 3, 'Crowd Shot': 4 }[activeClip.cam];
+                    camLabel.textContent = `CAM ${camNum}: ${activeClip.cam.toUpperCase()}`;
+                }, 200);
+            }
+
+            // Highlight active clips on timeline
+            const underPlayhead = getClipsUnderPlayhead(percent);
+            document.querySelectorAll('.clip').forEach(c => {
+                const trackNum = parseInt(c.parentElement.classList[1].replace('track-', ''));
+                const isActive = underPlayhead[trackNum] && underPlayhead[trackNum].cam === c.dataset.cam;
+                c.classList.toggle('active', isActive);
+            });
+        }
+
+        // Playback loop
+        function tick() {
+            if (!isPlaying) return;
+            playheadPercent += 0.08; // speed
+            if (playheadPercent >= 100) { playheadPercent = 0; }
+            updateUI(playheadPercent);
+            animFrame = requestAnimationFrame(tick);
+        }
+
+        // Play/Pause toggle
+        document.getElementById('playBtn').addEventListener('click', function () {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                tick();
+                this.style.borderLeftColor = 'var(--accent)';
+            } else {
+                cancelAnimationFrame(animFrame);
+                this.style.borderLeftColor = '';
+            }
+        });
+
+        // Click on progress bar to seek
+        document.getElementById('progTrack').addEventListener('click', function (e) {
+            const rect = this.getBoundingClientRect();
+            const pct = ((e.clientX - rect.left) / rect.width) * 100;
+            updateUI(pct);
+        });
+
+        // Click on tracks to seek
+        tracksContainer.addEventListener('click', function (e) {
+            if (e.target.closest('.clip')) return; // clip click handled separately
+            const rect = tracksContainer.getBoundingClientRect();
+            const pct = ((e.clientX - rect.left) / rect.width) * 100;
+            updateUI(pct);
+        });
+
+        // Start simulation after entrance animations
+        setTimeout(() => {
+            isPlaying = true;
+            tick();
+        }, 3000);
+
+        /* ===== Magnetic CTA ===== */
+        const cta = document.getElementById('ctaBtn');
+        cta.addEventListener('mousemove', e => {
+            const r = cta.getBoundingClientRect();
+            cta.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.18}px, ${(e.clientY - r.top - r.height / 2) * 0.18}px)`;
+        });
+        cta.addEventListener('mouseleave', () => cta.style.transform = 'translate(0,0)');
+        cta.addEventListener('click', e => {
+            const r = cta.getBoundingClientRect();
+            const rip = document.createElement('div');
+            rip.style.cssText = `position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);transform:scale(0);animation:ripplePop 0.5s linear;width:${Math.max(r.width, r.height)}px;height:${Math.max(r.width, r.height)}px;left:${e.clientX - r.left - Math.max(r.width, r.height) / 2}px;top:${e.clientY - r.top - Math.max(r.width, r.height) / 2}px;`;
+            cta.appendChild(rip); setTimeout(() => rip.remove(), 500);
+        });
+
+        /* ===== 3D Tilt ===== */
+        const card = document.getElementById('editorCard');
+        card.parentElement.addEventListener('mousemove', e => {
+            const r = card.parentElement.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width - 0.5;
+            const y = (e.clientY - r.top) / r.height - 0.5;
+            card.style.transform = `rotateY(${x * 5}deg) rotateX(${-y * 5}deg)`;
+        });
+        card.parentElement.addEventListener('mouseleave', () => card.style.transform = 'rotateY(0) rotateX(0)');
+
+        /* ===== Carousel ===== */
+        document.querySelectorAll('.c-dot').forEach(d => d.addEventListener('click', () => {
+            document.querySelectorAll('.c-dot').forEach((dot, i) => dot.classList.toggle('active', i === +d.dataset.i));
+        }));
+
+        /* ===== Canvas Nebula (Subtle) ===== */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, particles = [], mouse = { x: -1000, y: -1000 };
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        class P {
+            constructor() { this.x = Math.random() * w; this.y = Math.random() * h; this.vx = (Math.random() - 0.5) * 0.15; this.vy = (Math.random() - 0.5) * 0.15; this.s = Math.random() * 1.2 + 0.4; this.a = Math.random() * 0.3 + 0.1; }
+            update() { const dx = mouse.x - this.x, dy = mouse.y - this.y, d = Math.hypot(dx, dy); if (d < 200) { this.vx -= dx / d * 0.02; this.vy -= dy / d * 0.02; } this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > w) this.vx *= -1; if (this.y < 0 || this.y > h) this.vy *= -1; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2); ctx.fillStyle = `rgba(79,172,254,${this.a})`; ctx.fill(); }
+        }
+        for (let i = 0; i < 80; i++) particles.push(new P());
+        function anim() {
+            ctx.clearRect(0, 0, w, h);
+            particles.forEach(p => { p.update(); p.draw(); });
+            ctx.strokeStyle = 'rgba(79,172,254,0.04)'; ctx.lineWidth = 0.5;
+            for (let i = 0; i < particles.length; i++)for (let j = i + 1; j < particles.length; j++) { const d = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y); if (d < 120) { ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); } }
+            requestAnimationFrame(anim);
+        }
+        anim();
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    </script>
+</body>
+
+</html>

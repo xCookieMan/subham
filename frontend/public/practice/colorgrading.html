@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinematic Colorist Portfolio</title>
+    <!-- High-End Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #080808;
+            --accent-color: #D4AF37; /* Cinematic Gold */
+            --text-color: #f0f0f0;
+            --font-display: 'Syne', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-display);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 1. FILM GRAIN OVERLAY (Cinematic Feel) */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* 2. MAIN LAYOUT */
+        .portfolio-stage {
+            width: 90%;
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        /* 3. TEXT CONTENT (Left) */
+        .text-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        .text-content h1 {
+            font-size: 4.5rem;
+            line-height: 0.9;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            font-weight: 800;
+        }
+        
+        .text-content h1 span {
+            display: block;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+        }
+
+        .text-content p {
+            font-family: var(--font-mono);
+            color: #888;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 400px;
+        }
+
+        .cta-btn {
+            padding: 15px 35px;
+            background: var(--accent-color);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            font-family: var(--font-mono);
+        }
+        
+        .cta-btn:hover {
+            background: #fff;
+            transform: scale(1.05);
+        }
+
+        /* 4. VIEWFINDER SLIDER (Right) */
+        .viewfinder-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: ew-resize;
+        }
+
+        /* Corner Brackets */
+        .bracket {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: var(--accent-color);
+            border-style: solid;
+            z-index: 20;
+            pointer-events: none;
+        }
+        .b-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+        .b-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+        .b-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+        .b-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+        /* Images */
+        .img-before {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) brightness(0.6) contrast(1.2); /* Flat Log Look */
+        }
+
+        .img-after-mask {
+            position: absolute;
+            top: 0; left: 0;
+            height: 100%;
+            width: 50%; /* JS handles this */
+            overflow: hidden;
+            border-right: 1px solid var(--accent-color);
+            z-index: 5;
+        }
+
+        .img-after-mask img {
+            width: 100%; /* JS sets this to match parent width */
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Center Handle */
+        .slider-handle {
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 50%;
+            width: 40px;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .handle-circle {
+            width: 40px;
+            height: 40px;
+            background: #000;
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .handle-line {
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 50%;
+            width: 1px;
+            background: var(--accent-color);
+            opacity: 0.5;
+        }
+
+        /* Labels inside slider */
+        .label-badge {
+            position: absolute;
+            top: 20px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 15;
+        }
+
+        .lbl-before { left: 20px; color: #888; }
+        .lbl-after { right: 20px; color: var(--accent-color); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .portfolio-stage { grid-template-columns: 1fr; text-align: center; }
+            .text-content h1 { font-size: 3rem; }
+            .text-content p { margin: 0 auto 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise-overlay"></div>
+
+    <div class="portfolio-stage">
+        <!-- Left Side -->
+        <div class="text-content">
+            <h1>Cinematic<br><span>Color Grading</span></h1>
+            <p>I transform flat log footage into rich, emotive cinematic visuals. Professional color science for filmmakers.</p>
+            <button class="cta-btn">View Showreel</button>
+        </div>
+
+        <!-- Right Side (Slider) -->
+        <div class="viewfinder-wrapper" id="slider">
+            <!-- Corner Brackets -->
+            <div class="bracket b-tl"></div>
+            <div class="bracket b-tr"></div>
+            <div class="bracket b-bl"></div>
+            <div class="bracket b-br"></div>
+
+            <!-- Before Image -->
+            <img src="https://images.unsplash.com/photo-1519681393784-d8e5b5a45704?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" class="img-before" alt="Log">
+            <div class="label-badge lbl-before">RAW LOG</div>
+
+            <!-- After Image (Masked) -->
+            <div class="img-after-mask" id="mask">
+                <img src="https://images.unsplash.com/photo-1519681393784-d8e5b5a45704?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" id="after-img" alt="Grade">
+                <div class="label-badge lbl-after">FINAL GRADE</div>
+            </div>
+
+            <!-- Handle -->
+            <div class="slider-handle" id="handle">
+                <div class="handle-line"></div>
+                <div class="handle-circle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                        <path d="M21 18l-6-6 6-6" style="transform: translateX(-12px)"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.getElementById('slider');
+            const mask = document.getElementById('mask');
+            const afterImg = document.getElementById('after-img');
+            const handle = document.getElementById('handle');
+            
+            let isDragging = false;
+            let currentWidth = 50; // Percentage
+
+            // Update Function
+            function updateSlider(clientX) {
+                const rect = slider.getBoundingClientRect();
+                let x = clientX - rect.left;
+                
+                // Limits
+                if (x < 0) x = 0;
+                if (x > rect.width) x = rect.width;
+
+                const percent = (x / rect.width) * 100;
+                currentWidth = percent;
+
+                mask.style.width = percent + '%';
+                handle.style.left = percent + '%';
+                
+                // FIX: Keep inner image full width to prevent squashing
+                afterImg.style.width = rect.width + 'px';
+            }
+
+            // Initialize
+            setTimeout(() => {
+                const rect = slider.getBoundingClientRect();
+                afterImg.style.width = rect.width + 'px';
+                
+                // Auto-Play Animation
+                let start = 20;
+                let end = 80;
+                let duration = 2000;
+                let startTime = null;
+
+                function animate(time) {
+                    if (!startTime) startTime = time;
+                    let progress = (time - startTime) / duration;
+                    
+                    if (progress < 1) {
+                        let ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+                        let val = start + (end - start) * ease;
+                        
+                        mask.style.width = val + '%';
+                        handle.style.left = val + '%';
+                        
+                        requestAnimationFrame(animate);
+                    } else {
+                        // Reset to center smoothly
+                        mask.style.width = '50%';
+                        handle.style.left = '50%';
+                    }
+                }
+                requestAnimationFrame(animate);
+            }, 500);
+
+            // Events
+            slider.addEventListener('mousedown', (e) => { isDragging = true; updateSlider(e.clientX); });
+            window.addEventListener('mousemove', (e) => { if(isDragging) updateSlider(e.clientX); });
+            window.addEventListener('mouseup', () => isDragging = false);
+
+            // Touch
+            slider.addEventListener('touchstart', (e) => { isDragging = true; updateSlider(e.touches[0].clientX); });
+            window.addEventListener('touchmove', (e) => { if(isDragging) updateSlider(e.touches[0].clientX); });
+            window.addEventListener('touchend', () => isDragging = false);
+
+            // Resize
+            window.addEventListener('resize', () => {
+                afterImg.style.width = slider.getBoundingClientRect().width + 'px';
+            });
+        });
+    </script>
+</body>
+</html>

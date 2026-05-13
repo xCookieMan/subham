@@ -1,0 +1,25 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+}
+
+:root {
+  --bg-color: #080808;
+  --accent-color: #D4AF37;
+  --text-color: #f0f0f0;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+body {
+  margin: 0;
+  font-family: "Rajdhani", "Segoe UI", system-ui, sans-serif;
+  background: #03060c;
+  color: #e4ebfa;
+}

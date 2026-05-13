@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentary & News Editor | ProCut Studio</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050510;
+            --panel: #12121c;
+            --panel-border: #252535;
+            --header: #1a1a28;
+            --accent: #c4a882;
+            /* Warm documentary amber */
+            --accent-glow: rgba(196, 168, 130, 0.3);
+            --accent2: #64748b;
+            /* Slate for journalistic feel */
+            --text: #e8e4df;
+            --muted: #6a6a78;
+            --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 999;
+            background-image: url("image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.25;
+        }
+
+        .app {
+            position: relative;
+            z-index: 10;
+            width: 96%;
+            max-width: 1500px;
+            display: grid;
+            grid-template-columns: 1fr 1.8fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) {
+            .app {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px 0;
+                overflow-y: auto;
+            }
+
+            .left {
+                order: 2;
+            }
+
+            .right {
+                order: 1;
+            }
+        }
+
+        /* ===== LEFT PANEL ===== */
+        .left {
+            padding-top: 10px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: rgba(196, 168, 130, 0.08);
+            border: 1px solid rgba(196, 168, 130, 0.25);
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            opacity: 0;
+        }
+
+        .badge.visible {
+            animation: slideIn 0.6s var(--ease) forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .badge .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: recPulse 1.5s infinite;
+        }
+
+        @keyframes recPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* 📰 NEW: Typewriter Title */
+        .title {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(2rem, 4.5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .title .line {
+            display: block;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .title .line span {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .title .line.typed span {
+            animation: typeReveal 0.8s var(--ease) forwards;
+        }
+
+        @keyframes typeReveal {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .title .line.typed::after {
+            content: '|';
+            position: absolute;
+            right: -2px;
+            top: 0;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            animation: cursorBlink 0.6s step-end infinite;
+        }
+
+        @keyframes cursorBlink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .title .line.done::after {
+            display: none;
+        }
+
+        .desc {
+            font-family: 'Playfair Display', serif;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.75;
+            max-width: 480px;
+            margin-bottom: 24px;
+            border-left: 2px solid var(--accent);
+            padding-left: 14px;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .desc.visible {
+            animation: fadeUp 0.8s var(--ease) forwards;
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .desc .hl {
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        .ftags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 24px;
+        }
+
+        .ftag {
+            padding: 5px 10px;
+            border: 1px solid rgba(196, 168, 130, 0.2);
+            border-radius: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem;
+            color: var(--accent);
+            background: rgba(196, 168, 130, 0.05);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 0.4s var(--ease);
+        }
+
+        .ftag.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ftag:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .cta {
+            position: relative;
+            padding: 12px 30px;
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s, box-shadow 0.3s;
+        }
+
+        .cta.visible {
+            animation: fadeUp 0.6s var(--ease) forwards;
+        }
+
+        .cta .fill {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent), #a08060);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s var(--ease);
+            z-index: 0;
+        }
+
+        .cta:hover .fill {
+            transform: scaleX(1);
+        }
+
+        .cta:hover {
+            color: var(--bg);
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .cta span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== RIGHT: Documentary Editor UI ===== */
+        .right {
+            width: 100%;
+        }
+
+        .doc-editor {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 580px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .doc-editor.visible {
+            animation: fadeUp 0.8s var(--ease) forwards;
+        }
+
+        @media (max-width: 900px) {
+            .doc-editor {
+                height: auto;
+            }
+        }
+
+        /* Top Bar */
+        .menu-bar {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: var(--header);
+            border-bottom: 1px solid var(--panel-border);
+            padding: 0 10px;
+            height: 28px;
+            font-size: 0.65rem;
+        }
+
+        .menu-item {
+            padding: 4px 10px;
+            color: var(--muted);
+            cursor: default;
+        }
+
+        .menu-item:hover {
+            color: var(--text);
+        }
+
+        .menu-item.active {
+            color: var(--text);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .menu-spacer {
+            flex: 1;
+        }
+
+        .menu-time {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 0.65rem;
+        }
+
+        /* Workspace: 2-column */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 240px;
+            flex: 1;
+            min-height: 0;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        @media (max-width: 900px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left side: Viewer + Clips */
+        .viewer-side {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Viewer */
+        .viewer-area {
+            background: #000;
+            position: relative;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .viewer-img-wrap {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .viewer-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: kenBurnsDoc 25s ease-in-out infinite alternate;
+        }
+
+        @keyframes kenBurnsDoc {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+
+            100% {
+                transform: scale(1.06) translate(-1%, -1.5%);
+            }
+        }
+
+        .viewer-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, transparent 30%, transparent 70%, rgba(0, 0, 0, 0.6) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .viewer-play {
+            width: 55px;
+            height: 55px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 5;
+        }
+
+        .viewer-play:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .viewer-play svg {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
+            margin-left: 3px;
+        }
+
+        /* 📋 Lower Third Animation */
+        .lower-third {
+            position: absolute;
+            bottom: 20px;
+            left: 15px;
+            opacity: 0;
+            transform: translateX(-20px);
+            z-index: 10;
+        }
+
+        .lower-third.visible {
+            animation: ltSlide 0.8s var(--ease) forwards;
+        }
+
+        @keyframes ltSlide {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .lt-line {
+            height: 3px;
+            background: var(--accent);
+            margin-bottom: 6px;
+            transform: scaleX(0);
+            transform-origin: left;
+        }
+
+        .lower-third.visible .lt-line {
+            animation: ltExpand 0.6s 0.3s var(--ease) forwards;
+        }
+
+        @keyframes ltExpand {
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        .lt-name {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .lt-role {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+
+        /* Viewer Info Bar */
+        .viewer-info {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.5rem;
+            color: var(--muted);
+            display: flex;
+            gap: 8px;
+        }
+
+        .viewer-info span {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .rec-badge {
+            color: #ef4444;
+        }
+
+        .rec-badge::before {
+            content: '● ';
+            animation: recPulse 1s infinite;
+        }
+
+        /* Clips Grid — 🎞️ Film Strip Style */
+        .clips-area {
+            background: var(--header);
+            border-top: 1px solid var(--panel-border);
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .clips-header {
+            padding: 4px 10px;
+            font-size: 0.55rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clips-scroll {
+            display: flex;
+            gap: 6px;
+            padding: 8px 10px;
+            overflow-x: auto;
+            height: calc(100% - 28px);
+            scroll-behavior: smooth;
+        }
+
+        .clips-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .clips-scroll::-webkit-scrollbar-track {
+            background: var(--panel);
+        }
+
+        .clips-scroll::-webkit-scrollbar-thumb {
+            background: var(--panel-border);
+            border-radius: 2px;
+        }
+
+        .clip-card {
+            flex-shrink: 0;
+            width: 100px;
+            height: 100%;
+            background: var(--panel);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid transparent;
+            transition: 0.2s;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        .clip-card.film-in {
+            animation: filmStrip 0.4s var(--ease) forwards;
+        }
+
+        @keyframes filmStrip {
+            0% {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .clip-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .clip-card .thumb {
+            width: 100%;
+            height: 60px;
+            overflow: hidden;
+        }
+
+        .clip-card .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .clip-card .clip-label {
+            padding: 3px 5px;
+            font-size: 0.45rem;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .clip-card .clip-dur {
+            font-size: 0.4rem;
+            color: var(--accent);
+        }
+
+        /* Right: Bin / Browser */
+        .bin-panel {
+            background: var(--panel);
+            border-left: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-label {
+            padding: 6px 10px;
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--panel-border);
+            background: var(--header);
+        }
+
+        .bin-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .bin-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.55rem;
+            color: var(--muted);
+            transition: 0.2s;
+        }
+
+        .bin-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+
+        .bin-item .icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+        }
+
+        .bin-item .icon.video {
+            background: var(--track-cgi);
+        }
+
+        .bin-item .icon.audio {
+            background: var(--track-score);
+        }
+
+        .bin-item .icon.graphic {
+            background: var(--track-light);
+        }
+
+        .bin-item .icon.map {
+            background: var(--track-particle);
+        }
+
+        .bin-item .count {
+            margin-left: auto;
+            font-size: 0.5rem;
+            opacity: 0.5;
+        }
+
+        /* Timeline */
+        .timeline-area {
+            background: var(--panel);
+            padding: 6px 10px;
+            border-top: 1px solid var(--panel-border);
+        }
+
+        .tl-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .tl-btn {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--header);
+            border: 1px solid var(--panel-border);
+            border-radius: 3px;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 0.55rem;
+        }
+
+        .tl-btn:hover {
+            color: var(--text);
+        }
+
+        .tl-btn.playing {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .tl-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .tl-spacer {
+            flex: 1;
+        }
+
+        .tl-tracks {
+            position: relative;
+        }
+
+        .tl-ruler {
+            height: 14px;
+            background: var(--header);
+            border-bottom: 1px solid var(--panel-border);
+            position: relative;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.4rem;
+            color: var(--muted);
+        }
+
+        .tl-ruler .tick {
+            position: absolute;
+            bottom: 0;
+            width: 1px;
+            background: var(--panel-border);
+        }
+
+        .tl-ruler .tick.major {
+            height: 8px;
+            background: var(--muted);
+        }
+
+        .tl-track {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            height: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .tl-track-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 5px;
+            font-size: 0.5rem;
+            font-weight: 600;
+            background: var(--header);
+            border-right: 1px solid var(--panel-border);
+            color: var(--muted);
+        }
+
+        .tl-track-label .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+
+        .tl-track-content {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tl-clip {
+            position: absolute;
+            top: 1px;
+            bottom: 1px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+            font-size: 0.45rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            cursor: pointer;
+            transition: 0.15s;
+            overflow: hidden;
+        }
+
+        .tl-clip:hover {
+            filter: brightness(1.3);
+        }
+
+        .tl-clip span {
+            position: relative;
+            z-index: 1;
+            white-space: nowrap;
+        }
+
+        .clip-interview {
+            background: #6b4c3b;
+        }
+
+        .clip-broll {
+            background: #3b5b4c;
+        }
+
+        .clip-archival {
+            background: #4c3b5b;
+        }
+
+        .clip-lower {
+            background: #3b4c5b;
+        }
+
+        .clip-score {
+            background: #5b3b4c;
+        }
+
+        .clip-audio {
+            background: #4b5563;
+        }
+
+        /* 🎵 Audio Waveform */
+        .waveform {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            gap: 1px;
+            padding: 2px;
+        }
+
+        .wave-bar {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 0.5px;
+            transition: height 0.1s ease;
+        }
+
+        .tl-playhead {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0%;
+            width: 2px;
+            background: #ef4444;
+            z-index: 20;
+            box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+        }
+
+        .tl-playhead::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -3px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 10px;
+            background: var(--header);
+            border-top: 1px solid var(--panel-border);
+            font-size: 0.5rem;
+            color: var(--muted);
+        }
+
+        /* Carousel */
+        .carousel {
+            margin-top: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .c-arrow {
+            width: 26px;
+            height: 26px;
+            border: 1px solid var(--panel-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.7rem;
+        }
+
+        .c-arrow:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .c-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .c-dot {
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .c-dot.active {
+            background: var(--accent);
+            width: 12px;
+            border-radius: 2px;
+        }
+
+        :root {
+            --track-cgi: #6b4c3b;
+            --track-particle: #3b5b6b;
+            --track-light: #5b5b3b;
+            --track-mesh: #3b5b4c;
+            --track-score: #5b3b4c;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="grain"></div>
+
+    <main class="app">
+        <!-- LEFT -->
+        <div class="left">
+            <div class="badge" id="badge">
+                <span class="pulse-dot"></span>
+                Journalism & Documentary
+            </div>
+            <h1 class="title" id="title">
+                <span class="line" id="line1"><span>DOCUMENTARY</span></span>
+                <span class="line" id="line2"><span>& NEWS EDITOR</span></span>
+            </h1>
+            <p class="desc" id="desc">
+                I produce impactful and compelling documentary narratives and news stories. My work focuses on rigorous
+                journalistic integrity, thoughtful storytelling, and <span class="hl">precise editing</span> to uncover
+                the truth and engage audiences. From feature documentaries to fast-paced segments, I craft narratives
+                that inform, educate, and provoke thought.
+            </p>
+            <div class="ftags">
+                <span class="ftag">Deep-Research</span>
+                <span class="ftag">Interview Cutting</span>
+                <span class="ftag">Story Arcs</span>
+                <span class="ftag">Fact-Checked</span>
+                <span class="ftag">Dynamic Pacing</span>
+            </div>
+            <button class="cta" id="ctaBtn">
+                <div class="fill"></div><span>WATCH SHOWREEL</span>
+            </button>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right">
+            <div class="doc-editor" id="docEditor">
+                <div class="menu-bar">
+                    <div class="menu-item">File</div>
+                    <div class="menu-item">Edit</div>
+                    <div class="menu-item active">Documentary</div>
+                    <div class="menu-item">Archive</div>
+                    <div class="menu-item">View</div>
+                    <div class="menu-item">Export</div>
+                    <div class="menu-spacer"></div>
+                    <span class="menu-time" id="menuTime">00:14:29:12</span>
+                </div>
+
+                <div class="workspace">
+                    <div class="viewer-side">
+                        <!-- Viewer -->
+                        <div class="viewer-area">
+                            <div class="viewer-img-wrap">
+                                <img src="https://picsum.photos/seed/docmain/1200/700" alt="Documentary Interview"
+                                    id="docImg">
+                            </div>
+                            <div class="viewer-overlay">
+                                <div class="viewer-play" id="viewerPlay">
+                                    <svg viewBox="0 0 24 24">
+                                        <polygon points="5,3 19,12 5,21" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <!-- Lower Third -->
+                            <div class="lower-third" id="lowerThird">
+                                <div class="lt-line"></div>
+                                <div class="lt-name" id="ltName">MARTHA CHEN</div>
+                                <div class="lt-role" id="ltRole">Documenting the Unseen</div>
+                            </div>
+                            <div class="viewer-info">
+                                <span class="rec-badge">REC</span>
+                                <span>4K 24fps</span>
+                                <span>LOG</span>
+                            </div>
+                        </div>
+
+                        <!-- Clips Strip -->
+                        <div class="clips-area">
+                            <div class="clips-header">
+                                <span>Interviews & B-Roll</span>
+                                <span style="color:var(--accent)">32 clips</span>
+                            </div>
+                            <div class="clips-scroll" id="clipsScroll">
+                                <!-- Built by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bin Panel -->
+                    <div class="bin-panel">
+                        <div class="panel-label">Project Bin</div>
+                        <div class="bin-list">
+                            <div class="bin-item"><span class="icon video">🎬</span>Interviews<span
+                                    class="count">12</span></div>
+                            <div class="bin-item"><span class="icon video">🎬</span>B-Roll<span class="count">24</span>
+                            </div>
+                            <div class="bin-item"><span class="icon video">🎬</span>Archival Footage<span
+                                    class="count">8</span></div>
+                            <div class="bin-item"><span class="icon audio">🎵</span>Interview Audio<span
+                                    class="count">12</span></div>
+                            <div class="bin-item"><span class="icon audio">🎵</span>Score & Ambience<span
+                                    class="count">6</span></div>
+                            <div class="bin-item"><span class="icon graphic">📊</span>Graphics & Maps<span
+                                    class="count">15</span></div>
+                            <div class="bin-item"><span class="icon map">🗺️</span>Lower Thirds<span
+                                    class="count">18</span></div>
+                            <div class="bin-item"><span class="icon graphic">📊</span>On-Screen Text<span
+                                    class="count">9</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="timeline-area">
+                    <div class="tl-toolbar">
+                        <div class="tl-btn" id="tlPlay">▶</div>
+                        <div class="tl-btn">⏮</div>
+                        <div class="tl-btn">⏭</div>
+                        <div class="tl-btn">↻</div>
+                        <span class="tl-time" id="tlTime">00:09:17:07</span>
+                        <div class="tl-spacer"></div>
+                        <span style="font-size:0.5rem;color:var(--muted)">Seq: Martha_Chen_Doc_v3</span>
+                    </div>
+                    <div class="tl-tracks">
+                        <div class="tl-ruler" id="tlRuler"></div>
+                        <div id="tlTracks"></div>
+                        <div class="tl-playhead" id="tlPlayhead"></div>
+                    </div>
+                </div>
+
+                <div class="status-bar">
+                    <div><span style="color:#22c55e">●</span> Online</div>
+                    <div>Tracks: 8</div>
+                    <div>Dur: 14:29:12</div>
+                    <div><span style="color:#eab308">●</span> Audio Peaks</div>
+                </div>
+            </div>
+            <div class="carousel">
+                <div class="c-arrow">‹</div>
+                <div class="c-dots" id="dots">
+                    <div class="c-dot active" data-i="0"></div>
+                    <div class="c-dot" data-i="1"></div>
+                    <div class="c-dot" data-i="2"></div>
+                    <div class="c-dot" data-i="3"></div>
+                    <div class="c-dot" data-i="4"></div>
+                </div>
+                <div class="c-arrow">›</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /* ===== Entrance Animations ===== */
+        const badge = document.getElementById('badge');
+        const line1 = document.getElementById('line1');
+        const line2 = document.getElementById('line2');
+        const desc = document.getElementById('desc');
+        const ftags = document.querySelectorAll('.ftag');
+        const cta = document.getElementById('ctaBtn');
+        const editor = document.getElementById('docEditor');
+
+        setTimeout(() => badge.classList.add('visible'), 200);
+        // Typewriter effect for title
+        setTimeout(() => {
+            line1.classList.add('typed');
+            setTimeout(() => {
+                line1.classList.add('done');
+                line2.classList.add('typed');
+                setTimeout(() => line2.classList.add('done'), 800);
+            }, 800);
+        }, 400);
+        setTimeout(() => desc.classList.add('visible'), 1400);
+        ftags.forEach((t, i) => setTimeout(() => t.classList.add('visible'), 1600 + i * 80));
+        setTimeout(() => cta.classList.add('visible'), 2000);
+        setTimeout(() => editor.classList.add('visible'), 600);
+
+        /* ===== Magnetic CTA ===== */
+        const ctaBtn = document.getElementById('ctaBtn');
+        ctaBtn.addEventListener('mousemove', e => {
+            const r = ctaBtn.getBoundingClientRect();
+            ctaBtn.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.12}px, ${(e.clientY - r.top - r.height / 2) * 0.12}px)`;
+        });
+        ctaBtn.addEventListener('mouseleave', () => ctaBtn.style.transform = 'translate(0,0)');
+
+        /* ===== Build Clips Strip ===== */
+        const clipsData = [
+            { seed: 'doc1', label: 'Martha Interview', dur: '04:23' },
+            { seed: 'doc2', label: 'Archival 1960s', dur: '01:45' },
+            { seed: 'doc3', label: 'On-location B-Roll', dur: '02:10' },
+            { seed: 'doc4', label: 'Map Animation', dur: '00:30' },
+            { seed: 'doc5', label: 'Historical Photos', dur: '01:15' },
+            { seed: 'doc6', label: 'Expert Interview', dur: '03:42' },
+            { seed: 'doc7', label: 'B-Roll Diverse', dur: '02:05' },
+            { seed: 'doc8', label: 'Specific Graphics', dur: '00:45' },
+            { seed: 'doc9', label: 'Nantucket Coast', dur: '01:50' },
+            { seed: 'doc10', label: 'Lower Thirds Pack', dur: '00:20' },
+        ];
+        const clipsScroll = document.getElementById('clipsScroll');
+        clipsData.forEach((c, i) => {
+            const card = document.createElement('div');
+            card.className = 'clip-card';
+            card.innerHTML = `
+        <div class="thumb"><img src="https://picsum.photos/seed/${c.seed}/200/130" alt="${c.label}" loading="lazy"></div>
+        <div class="clip-label">${c.label}</div>
+        <div class="clip-dur">${c.dur}</div>
+      `;
+            clipsScroll.appendChild(card);
+            setTimeout(() => card.classList.add('film-in'), 1200 + i * 80);
+        });
+
+        /* ===== Build Timeline ===== */
+        const trackData = [
+            {
+                name: 'Interview', color: '#6b4c3b', clips: [
+                    { start: 0, w: 40, label: 'Martha Chen Int.' },
+                    { start: 40, w: 25, label: 'Expert Interview' },
+                    { start: 65, w: 35, label: 'Martha Chen Int.' }
+                ]
+            },
+            {
+                name: 'B-Roll', color: '#3b5b4c', clips: [
+                    { start: 10, w: 20, label: 'Archival' },
+                    { start: 30, w: 15, label: 'Location' },
+                    { start: 50, w: 25, label: 'Historical' },
+                    { start: 80, w: 20, label: 'B-Roll' }
+                ]
+            },
+            {
+                name: 'Lower Thirds', color: '#3b4c5b', clips: [
+                    { start: 0, w: 8, label: 'LT: Martha' },
+                    { start: 40, w: 6, label: 'LT: Expert' },
+                    { start: 65, w: 8, label: 'LT: Martha' }
+                ]
+            },
+            {
+                name: 'Archival', color: '#4c3b5b', clips: [
+                    { start: 15, w: 15, label: '1960s Archive' },
+                    { start: 55, w: 20, label: 'Photos' }
+                ]
+            },
+            {
+                name: 'Score Track', color: '#5b3b4c', clips: [
+                    { start: 0, w: 100, label: '🎵 Score: Underscore' }
+                ]
+            },
+            {
+                name: 'Ambience', color: '#4b5563', clips: [
+                    { start: 0, w: 100, label: '🔊 Room Tone / Ambience' }
+                ]
+            }
+        ];
+
+        const tlTracks = document.getElementById('tlTracks');
+        trackData.forEach(track => {
+            const row = document.createElement('div');
+            row.className = 'tl-track';
+            let clipsHTML = '';
+            track.clips.forEach(c => {
+                const cls = track.name === 'Score Track' ? 'clip-score' :
+                    track.name === 'Ambience' ? 'clip-audio' :
+                        track.name === 'Lower Thirds' ? 'clip-lower' :
+                            track.name === 'Archival' ? 'clip-archival' :
+                                track.name === 'B-Roll' ? 'clip-broll' : 'clip-interview';
+                const isAudio = track.name === 'Score Track' || track.name === 'Ambience';
+                clipsHTML += `<div class="tl-clip ${cls}" style="left:${c.start}%;width:${c.w}%">
+          ${isAudio ? '<div class="waveform" data-track="' + track.name + '">' : ''}
+          <span>${c.label}</span>
+          ${isAudio ? '</div>' : ''}
+        </div>`;
+            });
+            row.innerHTML = `
+        <div class="tl-track-label"><span class="dot" style="background:${track.color}"></span>${track.name}</div>
+        <div class="tl-track-content">${clipsHTML}</div>
+      `;
+            tlTracks.appendChild(row);
+        });
+
+        // Ruler
+        const ruler = document.getElementById('tlRuler');
+        for (let i = 0; i <= 10; i++) {
+            const tick = document.createElement('div');
+            tick.className = 'tick' + (i % 5 === 0 ? ' major' : '');
+            tick.style.left = (i * 10) + '%';
+            tick.style.height = (i % 5 === 0 ? '8' : '4') + 'px';
+            ruler.appendChild(tick);
+        }
+
+        // Audio Waveform bars
+        document.querySelectorAll('.waveform').forEach(wf => {
+            for (let i = 0; i < 60; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'wave-bar';
+                bar.style.height = (Math.random() * 10 + 2) + 'px';
+                wf.appendChild(bar);
+            }
+        });
+
+        /* ===== Playback ===== */
+        const playhead = document.getElementById('tlPlayhead');
+        const tlTime = document.getElementById('tlTime');
+        const menuTime = document.getElementById('menuTime');
+        const docImg = document.getElementById('docImg');
+        const lowerThird = document.getElementById('lowerThird');
+        const ltName = document.getElementById('ltName');
+        const ltRole = document.getElementById('ltRole');
+
+        const subjects = [
+            { seed: 'docmain', name: 'MARTHA CHEN', role: 'Documenting the Unseen' },
+            { seed: 'doc2', name: 'DR. JAMES WILSON', role: 'Historical Analyst' },
+            { seed: 'doc5', name: 'ARCHIVAL FOOTAGE', role: '1968 — Civil Rights Era' },
+            { seed: 'doc6', name: 'SARAH MITCHELL', role: 'Field Researcher' }
+        ];
+
+        let progress = 0;
+        let isPlaying = false;
+        let currentSubject = 0;
+        let waveInterval;
+
+        function formatTC(pct) {
+            const totalSec = 869; // 14:29
+            const sec = Math.floor((pct / 100) * totalSec);
+            const m = String(Math.floor(sec / 60)).padStart(2, '0');
+            const s = String(sec % 60).padStart(2, '0');
+            const f = String(Math.floor((pct % 1) * 30)).padStart(2, '0');
+            return `00:${m}:${s}:${f}`;
+        }
+
+        function updateSubject(pct) {
+            let idx = pct < 25 ? 0 : pct < 50 ? 1 : pct < 75 ? 2 : 3;
+            if (idx !== currentSubject) {
+                currentSubject = idx;
+                const sub = subjects[idx];
+                docImg.style.opacity = 0;
+                setTimeout(() => {
+                    docImg.src = `https://picsum.photos/seed/${sub.seed}/1200/700`;
+                    docImg.style.opacity = 1;
+                    ltName.textContent = sub.name;
+                    ltRole.textContent = sub.role;
+                    // Re-trigger lower third animation
+                    lowerThird.classList.remove('visible');
+                    void lowerThird.offsetWidth;
+                    lowerThird.classList.add('visible');
+                }, 300);
+            }
+        }
+
+        function animateWaveform() {
+            document.querySelectorAll('.wave-bar').forEach(bar => {
+                const base = parseFloat(bar.style.height);
+                const variation = Math.random() * 6 - 3;
+                bar.style.height = Math.max(2, Math.min(14, base + variation)) + 'px';
+            });
+        }
+
+        function tick() {
+            if (!isPlaying) return;
+            progress += 0.06;
+            if (progress > 100) progress = 0;
+            playhead.style.left = progress + '%';
+            const tc = formatTC(progress);
+            tlTime.textContent = tc;
+            menuTime.textContent = tc;
+            updateSubject(progress);
+            requestAnimationFrame(tick);
+        }
+
+        waveInterval = setInterval(animateWaveform, 150);
+
+        document.getElementById('viewerPlay').addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            document.getElementById('tlPlay').classList.toggle('playing', isPlaying);
+            if (isPlaying) tick();
+        });
+        document.getElementById('tlPlay').addEventListener('click', function () {
+            isPlaying = !isPlaying;
+            this.classList.toggle('playing', isPlaying);
+            if (isPlaying) tick();
+        });
+
+        /* ===== Carousel ===== */
+        document.querySelectorAll('.c-dot').forEach(d => d.addEventListener('click', () => {
+            document.querySelectorAll('.c-dot').forEach((dot, i) => dot.classList.toggle('active', i === +d.dataset.i));
+        }));
+
+        /* ===== Canvas: Subtle Film Dust ===== */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, particles = [];
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        class FilmDust {
+            constructor() {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.s = Math.random() * 1.5 + 0.3;
+                this.a = Math.random() * 0.2 + 0.05;
+                this.speed = Math.random() * 0.2 + 0.05;
+            }
+            update() {
+                this.y -= this.speed;
+                if (this.y < -10) { this.y = h + 10; this.x = Math.random() * w; }
+            }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(196,168,130,${this.a})`; ctx.fill();
+            }
+        }
+        for (let i = 0; i < 60; i++) particles.push(new FilmDust());
+        function anim() {
+            ctx.clearRect(0, 0, w, h);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
+</body>
+
+</html>

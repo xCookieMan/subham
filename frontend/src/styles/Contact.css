@@ -1,0 +1,527 @@
+/* ───────── RESET & BASE ───────── */
+.contact-page {
+  position: relative;
+  background: transparent;
+  min-height: auto;
+  padding: clamp(60px, 10vw, 100px) clamp(20px, 5vw, 50px) 40px;
+  overflow: hidden;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Background Effects Removed - Using Global BG */
+
+/* ───────── CONTAINER ───────── */
+.contact-container {
+  position: relative;
+  z-index: 10;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ───────── HEADER ───────── */
+.contact-header {
+  text-align: center;
+  margin-bottom: clamp(40px, 8vw, 100px);
+}
+
+.contact-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.7rem;
+  letter-spacing: 5px;
+  color: #888;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.contact-kicker .dot {
+  width: 6px;
+  height: 6px;
+  background: #35a4ff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #35a4ff;
+}
+
+.contact-title {
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -3px;
+  line-height: 0.9;
+  margin-bottom: 30px;
+}
+
+.contact-title .accent {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+  transition: all 0.4s ease;
+}
+
+.contact-title:hover .accent {
+  -webkit-text-stroke-color: #35a4ff;
+  color: #35a4ff;
+  text-shadow: 0 0 30px rgba(53, 164, 255, 0.3);
+}
+
+.contact-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 500px;
+  margin: 0 auto;
+  font-weight: 300;
+}
+
+/* ───────── CONTENT LAYOUT ───────── */
+.contact-content {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: clamp(40px, 8vw, 100px);
+  align-items: start;
+}
+
+/* ───────── INFO SIDE ───────── */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+.info-group label {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  color: #444;
+  margin-bottom: 15px;
+  font-weight: 800;
+}
+
+.info-link {
+  font-size: 1.8rem;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.info-link:hover {
+  color: #35a4ff;
+}
+
+.social-links {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.social-icon-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 5px 0;
+}
+
+.icon-wrapper {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+}
+
+.icon-wrapper svg {
+  width: 18px;
+  height: 18px;
+  color: #666;
+  transition: all 0.4s ease;
+}
+
+.social-icon-link span {
+  font-size: 0.8rem;
+  color: #888;
+  letter-spacing: 2px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+/* Individual Social Colors & Effects */
+.social-icon-link:hover {
+  transform: translateX(10px);
+}
+
+.social-icon-link.instagram:hover .icon-wrapper { 
+  background: #E1306C; 
+  border-color: #E1306C;
+  box-shadow: 0 0 20px rgba(225, 48, 108, 0.4);
+}
+.social-icon-link.instagram:hover span { color: #E1306C; }
+
+.social-icon-link.youtube:hover .icon-wrapper { 
+  background: #FF0000; 
+  border-color: #FF0000;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+}
+.social-icon-link.youtube:hover span { color: #FF0000; }
+
+.social-icon-link.behance:hover .icon-wrapper { 
+  background: #1769FF; 
+  border-color: #1769FF;
+  box-shadow: 0 0 20px rgba(23, 105, 255, 0.4);
+}
+.social-icon-link.behance:hover span { color: #1769FF; }
+
+.social-icon-link.linkedin:hover .icon-wrapper { 
+  background: #0A66C2; 
+  border-color: #0A66C2;
+  box-shadow: 0 0 20px rgba(10, 102, 194, 0.4);
+}
+.social-icon-link.linkedin:hover span { color: #0A66C2; }
+
+.social-icon-link:hover .icon-wrapper svg {
+  color: #fff;
+  transform: scale(1.15);
+}
+
+.info-text {
+  font-size: 1rem;
+  color: #888;
+  letter-spacing: 1px;
+}
+
+/* ───────── FORM SIDE ───────── */
+.contact-form-wrapper {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 60px;
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+}
+
+.cinematic-form {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 15px 0;
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: inherit;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.input-group textarea {
+  min-height: 120px;
+  resize: none;
+}
+
+.input-group select {
+  cursor: pointer;
+  appearance: none;
+}
+
+.input-group select option {
+  background: #03060c;
+  color: #fff;
+}
+
+.bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #35a4ff;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.input-group input:focus ~ .bar,
+.input-group select:focus ~ .bar,
+.input-group textarea:focus ~ .bar {
+  width: 100%;
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+  outline: none;
+  border-bottom-color: transparent;
+}
+
+/* ───────── SUBMIT BUTTON (ADVANCED HUD THEME) ───────── */
+.submit-btn {
+  align-self: flex-start;
+  background: #0a0a0a;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 18px 45px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.btn-content {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.btn-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.btn-text {
+  font-size: 0.85rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.btn-timecode {
+  font-size: 0.55rem;
+  font-family: 'Courier New', Courier, monospace;
+  color: #35a4ff;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rec-dot {
+  width: 6px;
+  height: 6px;
+  background: #ff3535;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+/* UI Elements - Corner Brackets */
+.btn-ui-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #35a4ff;
+  opacity: 0.3;
+  transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.corner.tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+.corner.tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+.corner.bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+.corner.br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+.scan-line {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #35a4ff, transparent);
+  opacity: 0;
+  z-index: 2;
+}
+
+/* Hover States */
+.submit-btn:hover {
+  background: #000;
+  border-color: #35a4ff;
+  box-shadow: 0 0 30px rgba(53, 164, 255, 0.15);
+  transform: scale(1.02);
+}
+
+.submit-btn:hover .corner {
+  opacity: 1;
+  width: 12px;
+  height: 12px;
+}
+
+.submit-btn:hover .corner.tl { top: 5px; left: 5px; }
+.submit-btn:hover .corner.tr { top: 5px; right: 5px; }
+.submit-btn:hover .corner.bl { bottom: 5px; left: 5px; }
+.submit-btn:hover .corner.br { bottom: 5px; right: 5px; }
+
+.submit-btn:hover .btn-text {
+  color: #fff;
+  animation: glitch-text 0.3s infinite;
+}
+
+.btn-text::before,
+.btn-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.submit-btn:hover .btn-text::before {
+  opacity: 0.8;
+  color: #ff3535;
+  z-index: -1;
+  animation: glitch-offset 0.3s infinite;
+}
+
+.submit-btn:hover .btn-text::after {
+  opacity: 0.8;
+  color: #35ff94;
+  z-index: -2;
+  animation: glitch-offset 0.3s infinite reverse;
+}
+
+/* Animations */
+@keyframes glitch-offset {
+  0% { transform: translate(0); }
+  25% { transform: translate(2px, -1px); }
+  50% { transform: translate(-1px, 1px); }
+  75% { transform: translate(1px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.submit-btn:hover .btn-timecode {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.submit-btn:hover .rec-dot {
+  opacity: 1;
+  animation: pulse-red 0.8s infinite;
+}
+
+.submit-btn:hover .arrow {
+  transform: translateX(5px);
+}
+
+.submit-btn:hover .scan-line {
+  opacity: 0.5;
+  animation: scan 2s linear infinite;
+}
+
+/* Animations */
+@keyframes scan {
+  0% { top: -10% }
+  100% { top: 110% }
+}
+
+@keyframes pulse-red {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.5; }
+}
+
+@keyframes glitch-text {
+  0% { transform: translate(0); }
+  20% { transform: translate(-1px, 1px); }
+  40% { transform: translate(-1px, -1px); }
+  60% { transform: translate(1px, 1px); }
+  80% { transform: translate(1px, -1px); }
+  100% { transform: translate(0); }
+}
+
+.submit-btn:active {
+  transform: scale(0.98);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.loading-text {
+  letter-spacing: 5px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ───────── RESPONSIVE ───────── */
+@media (max-width: 1024px) {
+  .contact-content {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+
+  .contact-info {
+    order: 2;
+    align-items: center;
+    text-align: center;
+  }
+
+  .social-links {
+    align-items: center;
+  }
+
+  .social-icon-link:hover {
+    transform: translateY(-5px);
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-page {
+    padding-top: 80px;
+  }
+
+  .contact-title {
+    font-size: 3rem;
+  }
+
+  .info-link {
+    font-size: 1.4rem;
+  }
+}

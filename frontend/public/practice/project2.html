@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Night Drive - Commercial Edit</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1492144534655-ae79c964cdd8?q=80&w=2500&auto=format&fit=crop') no-repeat center center/cover;
+            transition: background-image 0.8s ease;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.15) 100%),
+                linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, transparent 35%);
+            z-index: 1;
+        }
+
+        .header {
+            position: absolute;
+            top: 35px;
+            left: 55px;
+            z-index: 10;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .header:hover {
+            opacity: 1;
+            color: #fff;
+        }
+
+        .header i {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .header:hover i {
+            transform: translateX(-4px);
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            justify-content: space-between;
+            height: 100%;
+            padding: 60px 55px;
+        }
+
+        .info-section {
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: slideIn 1s ease;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 68px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -3px;
+            text-transform: uppercase;
+            line-height: 0.95;
+            background: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 30px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .tag::before {
+            content: '';
+            width: 30px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .description {
+            font-size: 15px;
+            line-height: 1.9;
+            color: rgba(255, 255, 255, 0.55);
+            margin-bottom: 45px;
+            max-width: 420px;
+            font-weight: 300;
+        }
+
+        .details-grid {
+            display: grid;
+            gap: 25px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .detail-item:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .detail-item:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .detail-item:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .detail-item .label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 500;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .detail-item .value {
+            font-size: 18px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            padding-left: 2px;
+        }
+
+        .gallery-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 14px;
+            padding-right: 10px;
+        }
+
+        .gallery-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .gallery-counter {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.15);
+            line-height: 1;
+        }
+
+        .gallery-counter .current {
+            color: #fff;
+            font-size: 52px;
+        }
+
+        .gallery-type {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+        }
+
+        .thumbnail {
+            width: 130px;
+            height: 78px;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            opacity: 0.35;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thumbnail::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .thumbnail:hover::before {
+            opacity: 1;
+        }
+
+        .thumbnail:hover {
+            opacity: 1;
+            transform: translateX(-8px) scale(1.05);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .thumbnail.active {
+            opacity: 1;
+            transform: translateX(-5px) scale(1.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .thumbnail.active::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 6px;
+            pointer-events: none;
+        }
+
+        .thumbnail.video .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-left: 14px solid rgba(255, 255, 255, 0.8);
+            border-top: 9px solid transparent;
+            border-bottom: 9px solid transparent;
+            z-index: 2;
+        }
+
+        .thumbnail.video.active .play-icon {
+            border-left-color: #fff;
+        }
+
+        /* --- PROCESS BAR --- */
+        .process-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            padding: 35px 55px 45px 55px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .steps-container {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.4s ease;
+        }
+
+        .step-icon-wrap {
+            position: relative;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s ease;
+        }
+
+        .glass-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.4s ease;
+        }
+
+        .step:hover .glass-bg {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: scale(1.1);
+        }
+
+        .step i {
+            font-size: 24px;
+            position: relative;
+            z-index: 2;
+            color: rgba(255, 255, 255, 0.25);
+            transition: all 0.4s ease;
+        }
+
+        .step:hover i {
+            color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.1);
+        }
+
+        .step span {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 14px;
+            color: rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+            white-space: nowrap;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .step small {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 4px;
+            transition: all 0.4s ease;
+            white-space: nowrap;
+        }
+
+        /* Connector lines */
+        .connector {
+            width: 40px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 0 8px;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .connector::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        /* Step active state with colors */
+        .step.active span {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .step.active small {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .step.active .step-icon-wrap {
+            transform: scale(1.1);
+        }
+
+        .step[data-color="cyan"].active i {
+            color: #00d4ff;
+            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
+        }
+
+        .step[data-color="cyan"].active .glass-bg {
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .step[data-color="red"].active i {
+            color: #ff4757;
+            filter: drop-shadow(0 0 10px rgba(255, 71, 87, 0.5));
+        }
+
+        .step[data-color="red"].active .glass-bg {
+            border-color: rgba(255, 71, 87, 0.3);
+            box-shadow: 0 0 30px rgba(255, 71, 87, 0.1);
+        }
+
+        .step[data-color="orange"].active i {
+            color: #ffa502;
+            filter: drop-shadow(0 0 10px rgba(255, 165, 2, 0.5));
+        }
+
+        .step[data-color="orange"].active .glass-bg {
+            border-color: rgba(255, 165, 2, 0.3);
+            box-shadow: 0 0 30px rgba(255, 165, 2, 0.1);
+        }
+
+        .step[data-color="green"].active i {
+            color: #2ed573;
+            filter: drop-shadow(0 0 10px rgba(46, 213, 115, 0.5));
+        }
+
+        .step[data-color="green"].active .glass-bg {
+            border-color: rgba(46, 213, 115, 0.3);
+            box-shadow: 0 0 30px rgba(46, 213, 115, 0.1);
+        }
+
+        .step[data-color="purple"].active i {
+            color: #a55eea;
+            filter: drop-shadow(0 0 10px rgba(165, 94, 234, 0.5));
+        }
+
+        .step[data-color="purple"].active .glass-bg {
+            border-color: rgba(165, 94, 234, 0.3);
+            box-shadow: 0 0 30px rgba(165, 94, 234, 0.1);
+        }
+
+        .step[data-color="pink"].active i {
+            color: #ff6b9d;
+            filter: drop-shadow(0 0 10px rgba(255, 107, 157, 0.5));
+        }
+
+        .step[data-color="pink"].active .glass-bg {
+            border-color: rgba(255, 107, 157, 0.3);
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.1);
+        }
+
+        .step[data-color="cyan"]:hover i {
+            color: #00d4ff;
+        }
+
+        .step[data-color="red"]:hover i {
+            color: #ff4757;
+        }
+
+        .step[data-color="orange"]:hover i {
+            color: #ffa502;
+        }
+
+        .step[data-color="green"]:hover i {
+            color: #2ed573;
+        }
+
+        .step[data-color="purple"]:hover i {
+            color: #a55eea;
+        }
+
+        .step[data-color="pink"]:hover i {
+            color: #ff6b9d;
+        }
+
+        .step-num {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 8px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.2);
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-num {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .flash-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.03);
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .flash-overlay.active {
+            animation: flashFade 0.4s ease;
+        }
+
+        @keyframes flashFade {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" id="bgContainer">
+        <div class="overlay"></div>
+        <div class="flash-overlay" id="flashOverlay"></div>
+
+        <div class="header">
+            <i class="ri-arrow-left-s-line"></i> <span>Back to Work</span>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="info-section">
+                <h1>Night Drive</h1>
+                <div class="tag">Commercial Edit</div>
+                <p class="description">
+                    A high-energy commercial edit focused on speed, neon lights, and urban vibes.
+                    Every cut meticulously designed to create maximum visual impact.
+                </p>
+                <div class="details-grid">
+                    <div class="detail-item"><span class="label">Client</span><span class="value">AutoX Motors</span>
+                    </div>
+                    <div class="detail-item"><span class="label">Category</span><span class="value">Automotive
+                            Commercial</span></div>
+                    <div class="detail-item"><span class="label">Software</span><span class="value">Premiere Pro, After
+                            Effects</span></div>
+                </div>
+            </div>
+
+            <div class="gallery-section">
+                <div class="gallery-info">
+                    <div class="gallery-counter"><span class="current" id="currentNum">01</span> / <span
+                            id="totalNum">06</span></div>
+                    <span class="gallery-type" id="mediaType">Video</span>
+                </div>
+                <div class="thumbnail video active" data-index="1" data-type="Video"
+                    data-bg="https://images.unsplash.com/photo-1492144534655-ae79c964cdd8?q=80&w=2500&auto=format&fit=crop"
+                    style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964cdd8?w=200');">
+                    <div class="play-icon"></div>
+                </div>
+                <div class="thumbnail" data-index="2" data-type="Image"
+                    data-bg="https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=2500&auto=format&fit=crop"
+                    style="background-image: url('https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=200');">
+                </div>
+                <div class="thumbnail video" data-index="3" data-type="Video"
+                    data-bg="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=2500&auto=format&fit=crop"
+                    style="background-image: url('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=200');">
+                    <div class="play-icon"></div>
+                </div>
+                <div class="thumbnail" data-index="4" data-type="Image"
+                    data-bg="https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=2500&auto=format&fit=crop"
+                    style="background-image: url('https://images.unsplash.com/photo-1503376763036-066120622c74?w=200');">
+                </div>
+                <div class="thumbnail video" data-index="5" data-type="Video"
+                    data-bg="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2500&auto=format&fit=crop"
+                    style="background-image: url('https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=200');">
+                    <div class="play-icon"></div>
+                </div>
+                <div class="thumbnail" data-index="6" data-type="Image"
+                    data-bg="https://images.unsplash.com/photo-1494783367193-149034c05e8f?q=80&w=2500&auto=format&fit=crop"
+                    style="background-image: url('https://images.unsplash.com/photo-1494783367193-149034c05e8f?w=200');">
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Steps - Fixed & Decoupled -->
+        <div class="process-bar">
+            <div class="steps-container">
+                <div class="step" data-color="cyan">
+                    <div class="step-icon-wrap">
+                        <div class="glass-bg"></div><i class="ri-hard-drive-2-line"></i><span class="step-num">01</span>
+                    </div><span>Ingest</span><small>Raw Footage</small>
+                </div>
+                <div class="connector"></div>
+                <div class="step active" data-color="red">
+                    <div class="step-icon-wrap">
+                        <div class="glass-bg"></div><i class="ri-scissors-cut-line"></i><span class="step-num">02</span>
+                    </div><span>Edit</span><small>Cut & Sequence</small>
+                </div>
+                <div class="connector"></div>
+                <div class="step" data-color="orange">
+                    <div class="step-icon-wrap">
+                        <div class="glass-bg"></div><i class="ri-magic-line"></i><span class="step-num">03</span>
+                    </div><span>Enhance</span><small>VFX & Transitions</small>
+                </div>
+                <div class="connector"></div>
+                <div class="step" data-color="green">
+                    <div class="step-icon-wrap">
+                        <div class="glass-bg"></div><i class="ri-palette-line"></i><span class="step-num">04</span>
+                    </div><span>Grade</span><small>Color Correction</small>
+                </div>
+                <div class="connector"></div>
+                <div class="step" data-color="purple">
+                    <div class="step-icon-wrap">
+                        <div class="glass-bg"></div><i class="ri-volume-up-line"></i><span class="step-num">05</span>
+                    </div><span>Audio</span><small>Sound Design</small>
+                </div>
+                <div class="connector"></div>
+                <div class="step" data-color="pink">
+                    <div class="step-icon-wrap">
+                        <div class="glass-bg"></div><i class="ri-send-plane-2-line"></i><span class="step-num">06</span>
+                    </div><span>Deliver</span><small>Final Output</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const bgContainer = document.getElementById('bgContainer');
+        const currentNumEl = document.getElementById('currentNum');
+        const totalNumEl = document.getElementById('totalNum');
+        const flashOverlay = document.getElementById('flashOverlay');
+        const mediaTypeEl = document.getElementById('mediaType');
+        const steps = document.querySelectorAll('.step');
+
+        totalNumEl.textContent = String(thumbnails.length).padStart(2, '0');
+
+        // Gallery Navigation - ONLY changes background & counter
+        thumbnails.forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                thumbnails.forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+
+                const index = parseInt(thumb.dataset.index);
+                currentNumEl.textContent = String(index).padStart(2, '0');
+                mediaTypeEl.textContent = thumb.dataset.type;
+
+                bgContainer.style.backgroundImage = `url('${thumb.dataset.bg}')`;
+
+                // Flash effect
+                flashOverlay.classList.remove('active');
+                void flashOverlay.offsetWidth;
+                flashOverlay.classList.add('active');
+            });
+        });
+
+        // Process Steps - Independent visual interaction
+        steps.forEach(step => {
+            step.addEventListener('click', () => {
+                steps.forEach(s => s.classList.remove('active'));
+                step.classList.add('active');
+                // Does NOT affect gallery or background
+            });
+        });
+
+        // Keyboard navigation for gallery only
+        let currentIndex = 1;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                currentIndex = currentIndex < thumbnails.length ? currentIndex + 1 : 1;
+                navigateTo(currentIndex);
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                currentIndex = currentIndex > 1 ? currentIndex - 1 : thumbnails.length;
+                navigateTo(currentIndex);
+            }
+        });
+
+        function navigateTo(index) {
+            thumbnails.forEach(t => t.classList.remove('active'));
+            thumbnails[index - 1].classList.add('active');
+            currentNumEl.textContent = String(index).padStart(2, '0');
+            mediaTypeEl.textContent = thumbnails[index - 1].dataset.type;
+            bgContainer.style.backgroundImage = `url('${thumbnails[index - 1].dataset.bg}')`;
+        }
+
+        // Auto-rotate gallery
+        setInterval(() => {
+            currentIndex = currentIndex < thumbnails.length ? currentIndex + 1 : 1;
+            navigateTo(currentIndex);
+        }, 6000);
+    </script>
+</body>
+
+</html>

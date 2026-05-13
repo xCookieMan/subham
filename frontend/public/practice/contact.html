@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Get In Touch</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0f;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+        }
+
+        .contact-section {
+            position: relative;
+            min-height: 100vh;
+            padding: 80px 100px;
+            overflow: hidden;
+        }
+
+        .contact-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%), url('background3.png') center center / cover no-repeat;
+            z-index: 0;
+        }
+
+
+        .contact-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right,
+                    rgba(10, 10, 15, 0.95) 0%,
+                    rgba(10, 10, 15, 0.75) 40%,
+                    rgba(10, 10, 15, 0.6) 100%);
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 60px;
+            max-width: 1400px;
+            width: 100%;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+
+        /* Left Side */
+        .left-content {
+            flex: 1.2;
+            max-width: 500px;
+        }
+
+
+        .label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #ff6644;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .label i {
+            font-size: 0.6rem;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        h1 span {
+            display: block;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #9999aa;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .contact-details {
+            margin-bottom: 40px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .detail-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .detail-text span {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666688;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .detail-text p {
+            font-size: 0.95rem;
+            color: #dddde8;
+            font-weight: 400;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-icon {
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .social-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        /* Right Side — Form Final Position */
+        .right-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            min-height: 70vh;
+            margin-top: 220px;
+            margin-left: 10px;
+        }
+
+
+
+
+
+        .form-card {
+            background: rgba(15, 15, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #555566;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: rgba(74, 158, 255, 0.5);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.08);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: transparent;
+            border: 1px solid rgba(74, 158, 255, 0.4);
+            border-radius: 10px;
+            color: #4a9eff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.35s ease;
+        }
+
+        .submit-btn:hover {
+            background: rgba(74, 158, 255, 0.1);
+            border-color: #4a9eff;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(74, 158, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .left-content>* {
+            animation: fadeInUp 0.8s ease backwards;
+        }
+
+        .left-content>*:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .left-content>*:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .left-content>*:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .left-content>*:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .left-content>*:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .form-card {
+            animation: fadeInUp 1s ease 0.4s backwards;
+        }
+
+        @media (max-width: 1024px) {
+            .contact-section {
+                padding: 60px 40px;
+            }
+
+            .container {
+                flex-direction: column;
+                gap: 60px;
+            }
+
+            .left-content {
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .detail-item {
+                justify-content: center;
+            }
+
+            .social-icons {
+                justify-content: center;
+            }
+
+            .right-content {
+                padding-top: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .contact-section {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .form-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="contact-section">
+        <div class="contact-bg"></div>
+
+        <div class="container">
+            <!-- Left Content -->
+            <div class="left-content">
+                <div class="label">
+                    <i class="fas fa-arrow-right"></i>
+                    GET IN TOUCH
+                </div>
+
+                <h1>
+                    LET'S CREATE
+                    <span>SOMETHING EPIC</span>
+                </h1>
+
+                <p class="subtitle">
+                    Have a project in mind?<br>
+                    Let's bring your ideas to life.
+                </p>
+
+                <div class="contact-details">
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="detail-text">
+                            <span>EMAIL</span>
+                            <p>hello@akeditor.com</p>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fas fa-phone"></i></div>
+                        <div class="detail-text">
+                            <span>PHONE</span>
+                            <p>+91 98765 43210</p>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="detail-text">
+                            <span>LOCATION</span>
+                            <p>India</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-behance"></i></a>
+                </div>
+            </div>
+
+            <!-- Right Content — Form (Center + Niche) -->
+            <div class="right-content">
+                <form class="form-card" onsubmit="event.preventDefault(); alert('Message sent! 🚀');">
+                    <div class="form-group">
+                        <input type="text" placeholder="YOUR NAME" required />
+                    </div>
+                    <div class="form-group">
+                        <input type="email" placeholder="EMAIL ADDRESS" required />
+                    </div>
+                    <div class="form-group">
+                        <textarea placeholder="PROJECT DETAILS" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">SEND MESSAGE</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+</body>
+
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Footer - AK Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #030303;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .footer {
+            background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
+            padding: 100px 60px 40px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated Background Elements */
+        .bg-mesh {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(at 0% 0%, rgba(0, 136, 255, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(136, 68, 255, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 85, 34, 0.06) 0px, transparent 50%);
+            animation: meshDrift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes meshDrift {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(-30px, 30px) scale(1.05);
+            }
+        }
+
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 136, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 136, 255, 0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridScroll 40s linear infinite;
+            mask-image: radial-gradient(circle at 50% 50%, black 20%, transparent 70%);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 20%, transparent 70%);
+        }
+
+        @keyframes gridScroll {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0);
+            }
+
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(60px);
+            }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: floatUp 15s infinite linear;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-10vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
+            gap: 50px;
+            margin-bottom: 70px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Brand Section (Clean) */
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-logo {
+            margin-bottom: 20px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .footer-logo img {
+            width: 56px;
+            height: auto;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.2));
+        }
+
+        .footer-logo:hover img {
+            transform: scale(1.08) rotate(3deg);
+            filter: drop-shadow(0 0 25px rgba(0, 136, 255, 0.5));
+        }
+
+        .footer-tagline {
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 300;
+            max-width: 260px;
+            position: relative;
+            padding-left: 12px;
+            border-left: 2px solid rgba(0, 136, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .footer-brand:hover .footer-tagline {
+            color: rgba(255, 255, 255, 0.6);
+            border-left-color: #0088ff;
+        }
+
+        /* Column Base Styles */
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            opacity: 0;
+            transform: translateY(25px);
+            animation: revealUp 0.8s ease forwards;
+        }
+
+        .footer-col:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .footer-col:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .footer-col:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .footer-col:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes revealUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .footer-col-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-col-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #0088ff, #8844ff);
+            transition: width 0.4s ease;
+        }
+
+        .footer-col:hover .footer-col-title::after {
+            width: 100%;
+        }
+
+        /* Link Animations */
+        .footer-col a {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.35);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            position: relative;
+            padding-left: 4px;
+        }
+
+        .footer-col a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 1px;
+            background: #0088ff;
+            transition: width 0.3s ease;
+        }
+
+        .footer-col a:hover {
+            color: #fff;
+            padding-left: 14px;
+            text-shadow: 0 0 10px rgba(0, 136, 255, 0.2);
+        }
+
+        .footer-col a:hover::before {
+            width: 10px;
+        }
+
+        /* Connect Column - Social Links with Brand Colors */
+        .footer-col.connect a {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        .footer-col.connect a::before {
+            display: none;
+        }
+
+        .footer-col.connect a i {
+            margin-right: 10px;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .footer-col.connect a:hover {
+            transform: translateX(6px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer-col.connect a:hover i {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        /* Brand Colors for Social */
+        .social-insta {
+            color: #E1306C;
+        }
+
+        .social-insta:hover {
+            background: linear-gradient(45deg, rgba(225, 48, 108, 0.1), rgba(252, 175, 69, 0.1));
+            border-color: rgba(225, 48, 108, 0.4);
+        }
+
+        .social-yt {
+            color: #FF0000;
+        }
+
+        .social-yt:hover {
+            background: rgba(255, 0, 0, 0.08);
+            border-color: rgba(255, 0, 0, 0.4);
+        }
+
+        .social-linkedin {
+            color: #0A66C2;
+        }
+
+        .social-linkedin:hover {
+            background: rgba(10, 102, 194, 0.08);
+            border-color: rgba(10, 102, 194, 0.4);
+        }
+
+        .social-behance {
+            color: #1769FF;
+        }
+
+        .social-behance:hover {
+            background: rgba(23, 105, 255, 0.08);
+            border-color: rgba(23, 105, 255, 0.4);
+        }
+
+        /* Divider with Shine */
+        .footer-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.1) 80%, transparent);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer-divider::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: sweep 3s infinite;
+        }
+
+        @keyframes sweep {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Bottom Bar */
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-copyright {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
+            letter-spacing: 1px;
+        }
+
+        .footer-copyright span {
+            color: #0088ff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .footer-copyright:hover span {
+            color: #00ccff;
+            text-shadow: 0 0 12px rgba(0, 136, 255, 0.4);
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-legal a {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.25);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-bottom: 2px;
+        }
+
+        .footer-legal a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #0088ff;
+            transition: width 0.3s ease;
+        }
+
+        .footer-legal a:hover {
+            color: #fff;
+        }
+
+        .footer-legal a:hover::after {
+            width: 100%;
+        }
+
+        /* Scroll to Top */
+        .scroll-top {
+            position: absolute;
+            bottom: 40px;
+            right: 60px;
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(0, 136, 255, 0.3);
+            border-radius: 50%;
+            background: rgba(0, 136, 255, 0.08);
+            color: #0088ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: gentleBounce 3s ease-in-out infinite;
+        }
+
+        @keyframes gentleBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .scroll-top:hover {
+            animation: none;
+            background: rgba(0, 136, 255, 0.15);
+            border-color: rgba(0, 136, 255, 0.7);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 136, 255, 0.25);
+        }
+
+        .scroll-top i {
+            font-size: 22px;
+        }
+
+        .scroll-top:hover i {
+            transform: translateY(-2px);
+            transition: transform 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .footer {
+                padding: 80px 40px 30px 40px;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+            }
+
+            .footer-brand {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .footer {
+                padding: 60px 25px 25px 25px;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr;
+                gap: 35px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .scroll-top {
+                bottom: 25px;
+                right: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <footer class="footer">
+        <div class="bg-mesh"></div>
+        <div class="grid-overlay"></div>
+        <div class="particles" id="particles"></div>
+
+        <div class="footer-top">
+            <!-- Brand Column (Clean) -->
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="logo.png" alt="AK Logo">
+                </div>
+                <p class="footer-tagline">
+                    I craft cinematic stories that connect, inspire and leave a lasting impact.
+                </p>
+            </div>
+
+            <!-- Explore -->
+            <div class="footer-col">
+                <div class="footer-col-title">Explore</div>
+                <a href="#">Home</a>
+                <a href="#">Work</a>
+                <a href="#">About</a>
+                <a href="#">Services</a>
+                <a href="#">Contact</a>
+            </div>
+
+            <!-- Services -->
+            <div class="footer-col">
+                <div class="footer-col-title">Services</div>
+                <a href="#">Video Editing</a>
+                <a href="#">Color Grading</a>
+                <a href="#">Sound Design</a>
+                <a href="#">Visual Effects</a>
+                <a href="#">Short Form</a>
+            </div>
+
+            <!-- Resources -->
+            <div class="footer-col">
+                <div class="footer-col-title">Resources</div>
+                <a href="#">Process</a>
+                <a href="#">Tools</a>
+                <a href="#">FAQ</a>
+                <a href="#">Pricing</a>
+            </div>
+
+            <!-- Connect (Social Media Only Here) -->
+            <div class="footer-col connect">
+                <div class="footer-col-title">Connect</div>
+                <a href="#" class="social-insta"><i class="ri-instagram-line"></i> Instagram</a>
+                <a href="#" class="social-yt"><i class="ri-youtube-line"></i> YouTube</a>
+                <a href="#" class="social-linkedin"><i class="ri-linkedin-line"></i> LinkedIn</a>
+                <a href="#" class="social-behance"><i class="ri-behance-line"></i> Behance</a>
+            </div>
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <div class="footer-bottom">
+            <div class="footer-copyright">
+                © 2026 <span>AK EDITOR</span>. ALL RIGHTS RESERVED.
+            </div>
+            <div class="footer-legal">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms & Conditions</a>
+            </div>
+        </div>
+
+        <a href="#" class="scroll-top">
+            <i class="ri-arrow-up-line"></i>
+        </a>
+    </footer>
+
+    <script>
+        // Generate floating particles
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 15 + 's';
+            p.style.animationDuration = (10 + Math.random() * 10) + 's';
+            particleContainer.appendChild(p);
+        }
+
+        // Scroll to Top Logic
+        const scrollBtn = document.querySelector('.scroll-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollBtn.style.opacity = '1';
+                scrollBtn.style.visibility = 'visible';
+            } else {
+                scrollBtn.style.opacity = '0';
+                scrollBtn.style.visibility = 'hidden';
+            }
+        });
+        scrollBtn.style.opacity = '0';
+        scrollBtn.style.visibility = 'hidden';
+        scrollBtn.style.transition = 'opacity 0.3s ease, visibility 0.3s ease';
+
+        scrollBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Mouse Parallax on Background Mesh
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            document.querySelector('.bg-mesh').style.transform = `translate(${x * 15}px, ${y * 15}px)`;
+        });
+    </script>
+</body>
+
+</html>
