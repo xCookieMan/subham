@@ -175,10 +175,20 @@
     grid-template-columns: 1fr;
     margin-top: clamp(40px, 6vw, 80px);
     text-align: center;
+    justify-items: center;
   }
 
   .hero-copy h1 {
     font-size: clamp(32px, 5vw, 48px);
+    margin: 0 auto;
+  }
+
+  .hero-desc {
+    margin: 16px auto 0;
+  }
+
+  .hero-actions {
+    justify-content: center;
   }
 
   .home-nav {

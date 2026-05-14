@@ -345,51 +345,6 @@
   box-shadow: 0 0 10px rgba(53, 164, 255, 0.5);
 }
 
-@media (max-width: 1024px) {
-  .hero {
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    padding-top: 100px;
-  }
-
-  .hero-content {
-    max-width: 100%;
-    margin-bottom: 40px;
-  }
-
-  .hero-image-wrapper {
-    position: relative;
-    right: auto;
-    top: auto;
-    transform: none;
-    margin-top: 40px;
-  }
-
-  .person-img {
-    width: clamp(280px, 50vw, 450px);
-    margin: 0 auto;
-  }
-
-  .stats-row {
-    justify-content: center;
-  }
-
-  .stat-item::after {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero {
-    padding: 80px 20px 40px;
-  }
-
-  .hero-heading {
-    font-size: 2rem;
-  }
-}
-
 /* ───────── FLOATING PARTICLES ───────── */
 .floating-particle {
   position: absolute;
@@ -421,34 +376,17 @@
   }
 }
 
-/* ───────── RESPONSIVE ───────── */
-@media (max-width: 1200px) {
-  .hero {
-    padding: 60px 40px;
-  }
-
-  .hero-image-wrapper {
-    right: 40px;
-  }
-
-  .person-img {
-    width: 380px;
-  }
-}
-
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .hero {
     flex-direction: column;
-    padding: 60px 30px;
+    justify-content: center;
     text-align: center;
+    padding: 100px 20px 60px;
   }
 
   .hero-content {
     max-width: 100%;
-  }
-
-  .hero-heading {
-    font-size: 2rem;
+    margin-bottom: 40px;
   }
 
   .hero-image-wrapper {
@@ -460,13 +398,13 @@
   }
 
   .person-img {
-    width: 300px;
+    width: clamp(280px, 50vw, 450px);
+    margin: 0 auto;
   }
 
   .stats-row {
     justify-content: center;
     gap: 30px;
-    flex-wrap: wrap;
   }
 
   .stat-item::after {
@@ -486,17 +424,33 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .hero-heading {
+    font-size: clamp(1.6rem, 8vw, 2.2rem);
+  }
+
+  .signature {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
   .hero {
-    padding: 40px 20px;
+    padding: 80px 15px 40px;
   }
 
   .hero-heading {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
   }
 
   .person-img {
-    width: 250px;
+    width: 220px;
+  }
+
+  .stat-number {
+    font-size: 1.4rem;
+  }
+}
   }
 
   .stats-row {

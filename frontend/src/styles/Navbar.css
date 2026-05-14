@@ -236,14 +236,17 @@
     height: 30px;
   }
 }
-    padding: 0 20px;
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 0 10px;
   }
 
   .logo-img {
-    height: 32px;
+    height: 28px;
   }
 
   .mobile-links a {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
 }

@@ -139,15 +139,49 @@
 
 @media (max-width: 768px) {
   .work-page {
-    padding: 40px 20px;
+    padding: 40px 15px;
   }
 
   .header h1 {
-    font-size: 24px;
+    font-size: 22px;
+  }
+
+  .filter-bar {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    display: flex;
+    flex-wrap: nowrap;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+  }
+
+  .filter-bar::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+  }
+
+  .filter-btn {
+    flex: 0 0 auto;
+    padding: 6px 12px;
   }
 
   .grid {
     gap: 15px;
+    grid-template-columns: 1fr;
+  }
+
+  .card-info {
+    padding: 15px;
+  }
+
+  .card-title {
+    font-size: 13px;
+  }
+
+  .card-desc {
+    font-size: 10px;
   }
 }
 
